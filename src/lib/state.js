@@ -225,29 +225,21 @@ export function cleanup(state) {
       }
     }
 
-    // Timer-end active breaks
-    const stillActive = [];
-    for (const b of t.activeBreaks || []) {
-      const dur = t.config[TYPES[b.type].durKey];
-      const endAt = b.startedAt + dur * 1000;
-      if (now >= endAt) {
-        const entry = { ...b, endedAt: endAt, endReason: 'timer', team };
-        s.log.unshift(entry);
-        insertLog(entry);
-        if (!s.totalTime[b.userId])
-          s.totalTime[b.userId] = { name: b.userName, brb: 0, short: 0, lunch: 0, team };
-        s.totalTime[b.userId][b.type] += Math.min(dur * 1000, endAt - b.startedAt);
-        s.totalTime[b.userId].name = b.userName;
-      } else {
-        stillActive.push(b);
-      }
-    }
-    t.activeBreaks = stillActive;
+    // Keep ALL active breaks — don't auto-end on timer expiry.
+    // The UI already flags them as OVERSCHREDEN and the employee / admin
+    // must explicitly end them. This lets the user see the overtime tick
+    // up and the admin see who's still out.
+    t.activeBreaks = t.activeBreaks || [];
 
-    // Offer queue slots
+    // Offer queue slots — overrun breaks don't count against active capacity,
+    // so the queue can advance even if someone is overrun.
     for (const type of Object.keys(TYPES)) {
       const cap = t.config[TYPES[type].poolKey];
-      const activeCnt = t.activeBreaks.filter((b) => b.type === type).length;
+      const activeCnt = t.activeBreaks.filter((b) => {
+        if (b.type !== type) return false;
+        const dur = t.config[TYPES[type].durKey];
+        return now < b.startedAt + dur * 1000; // only count non-overrun
+      }).length;
       const offered = t.queues[type].filter((q) => q.offeredAt).length;
       let slots = Math.max(0, cap - activeCnt - offered);
       for (let i = 0; i < t.queues[type].length && slots > 0; i++) {

@@ -4,10 +4,13 @@ import { fmt } from '../lib/helpers';
 export function ActiveTicket({ myBreak, config, onEnd }) {
   const dur = config[TYPES[myBreak.type].durKey];
   const endAt = myBreak.startedAt + dur * 1000;
-  const remaining = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+  const now = Date.now();
+  const remaining = Math.max(0, Math.round((endAt - now) / 1000));
+  const overBySec = Math.max(0, Math.round((now - endAt) / 1000));
   const pct = Math.max(0, Math.min(100, ((dur - remaining) / dur) * 100));
-  const over = remaining === 0;
+  const over = now >= endAt;
   const def = TYPES[myBreak.type];
+
   return (
     <section className="t-active-wrap">
       <div
@@ -26,18 +29,23 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
           <span className="t-hole t-hole-b" />
         </div>
         <div className="t-stub-l">
-          <div className="t-stub-l-top">ACTIEF</div>
+          <div className="t-stub-l-top">{over ? 'OVERTIJD' : 'ACTIEF'}</div>
           <div className="t-stub-l-name">{myBreak.userName}</div>
           <div className="t-stub-l-bar">
-            <div className="t-stub-l-bar-fill" style={{ width: `${pct}%` }} />
+            <div
+              className="t-stub-l-bar-fill"
+              style={{ width: `${over ? 100 : pct}%` }}
+            />
           </div>
         </div>
       </div>
       <div className={`t-timer ${over ? 't-timer-over' : ''}`}>
-        <div className="t-timer-val">{fmt(remaining)}</div>
+        <div className="t-timer-val">
+          {over ? `+${fmt(overBySec)}` : fmt(remaining)}
+        </div>
         <div className="t-timer-sub">
           {over
-            ? 'Tijd op — keer terug'
+            ? 'Je bent over tijd — keer nu terug'
             : `Terug om ${new Date(endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
         </div>
         <button className="bm-btn bm-btn-primary bm-btn-lg" onClick={onEnd}>
