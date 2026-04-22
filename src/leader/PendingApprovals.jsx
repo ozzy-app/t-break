@@ -35,7 +35,7 @@ export function PendingApprovals({ pendingUsers, teamRequests, onApprove, onAppr
           </h3>
           <ul className="bm-admin-list">
             {teamRequests.map((r) => (
-              <li key={r.id} className="bm-admin-row">
+              <li key={r.id} className="bm-admin-row bm-admin-row-request">
                 <span className="bm-admin-name">{r.user_name}</span>
                 <span className="bm-admin-time">
                   {TEAM_LABELS[r.from_team] || '?'} → {TEAM_LABELS[r.to_team]}

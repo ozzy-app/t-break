@@ -9,7 +9,7 @@ export function AdminActiveRow({ b, config, onEnd }) {
   const over = now > endAt;
   const overBy = over ? now - endAt : 0;
   return (
-    <li className={`bm-admin-row ${over ? 'bm-admin-row-over' : ''}`}>
+    <li className={`bm-admin-row bm-admin-row-active ${over ? 'bm-admin-row-over' : ''}`}>
       <span className="bm-admin-name">{b.userName}</span>
       <span className={`bm-admin-type bm-admin-type-${b.type}`}>{TYPES[b.type].label}</span>
       <span className="bm-admin-time">

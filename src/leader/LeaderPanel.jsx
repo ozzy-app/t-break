@@ -27,6 +27,15 @@ export function LeaderPanel({
       <div className="bm-leader-header">
         <span className="bm-leader-eyebrow">Admin Panel</span>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {onOpenUserMgmt && (
+            <button
+              className="bm-cal-btn"
+              onClick={onOpenUserMgmt}
+              title="Gebruikersbeheer"
+            >
+              👤
+            </button>
+          )}
           <CalendarButton
             onOpenArchive={(d, log) => { setArchiveDate(d); setArchiveLog(log); }}
           />

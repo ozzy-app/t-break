@@ -145,7 +145,21 @@ export function UsersTable({ state, me, onGrantExtraBreak, onRemoveExtraBreak, o
 
   const sessions = state.sessions || {};
   const totalTime = state.totalTime || {};
-  const userIds = new Set([...Object.keys(sessions), ...Object.keys(totalTime)]);
+  const now = Date.now();
+  const ACTIVE_THRESHOLD_MS = 8 * 60 * 60 * 1000; // 8 hours — covers a full shift
+
+  // Build from sessions only (not totalTime, which accumulates stale entries)
+  // Show user if: seen recently OR currently on break/in queue
+  const userIds = new Set(Object.keys(sessions).filter(uid => {
+    const s = sessions[uid] || {};
+    const lastSeen = s.lastSeen || 0;
+    const recentlySeen = now - lastSeen < ACTIVE_THRESHOLD_MS;
+    const team = s.team || null;
+    const teamData = team ? state.teams[team] : null;
+    const onBreak = !!(teamData && teamData.activeBreaks.some(b => b.userId === uid));
+    const inQueue = !!(teamData && Object.values(teamData.queues).some(q => q.some(e => e.userId === uid)));
+    return recentlySeen || onBreak || inQueue;
+  }));
 
   const usersRaw = Array.from(userIds).map(uid => {
     const s = sessions[uid] || {};
@@ -179,11 +193,6 @@ export function UsersTable({ state, me, onGrantExtraBreak, onRemoveExtraBreak, o
       <h3 className="bm-leader-h3" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
         <span>Gebruikers</span>
         <span className="bm-leader-h3-count">{users.length}</span>
-        {onOpenUserMgmt && (
-          <button className="bm-users-mgmt-btn" onClick={onOpenUserMgmt} title="Open gebruikersbeheer">
-            👥 Beheer alle gebruikers
-          </button>
-        )}
       </h3>
       {users.length === 0 ? <div className="bm-empty">Nog geen gebruikers.</div> : (
         <div className="bm-user-table">
@@ -198,20 +207,30 @@ export function UsersTable({ state, me, onGrantExtraBreak, onRemoveExtraBreak, o
           </div>
           {users.map(u => {
             const teamData = u.team ? state.teams[u.team] : null;
-            // Compute overtime for the LAAT column
-            const now = Date.now();
+            const nowMs = Date.now();
             const EXPECTED_MS = { brb: 180000, short: 900000, lunch: 1800000 };
+            const MIN_SHOW_MS = 5000; // don't show LAAT until 5s over to avoid flicker
             let overMs = 0;
+            let isLate = false;
+
             if (u.overtimeTeam) {
-              // Currently on break past their timer
+              // Currently on break past their timer — live counter
               const td = state.teams[u.overtimeTeam];
               const b = td?.activeBreaks?.find(x => x.userId === u.uid);
               if (b) {
                 const exp = EXPECTED_MS[b.type] || 0;
-                overMs = exp > 0 ? Math.max(0, now - (b.startedAt + exp)) : 0;
+                overMs = exp > 0 ? Math.max(0, nowMs - (b.startedAt + exp)) : 0;
+                isLate = overMs >= MIN_SHOW_MS;
               }
+            } else if (state.overrunToday?.[u.uid]) {
+              // Returned already but was late — find their last logged overtime
+              // Estimate from the overrunToday flag — just show LAAT without time
+              isLate = true;
+              overMs = 0; // exact time was logged in the break log
             }
+
             const fmtOver = (ms) => {
+              if (!ms) return '';
               const m = Math.floor(ms / 60000);
               const s = Math.floor((ms % 60000) / 1000);
               return m > 0 ? `+${m}m${s > 0 ? `${s}s` : ''}` : `+${s}s`;
@@ -242,8 +261,8 @@ export function UsersTable({ state, me, onGrantExtraBreak, onRemoveExtraBreak, o
                 </span>
                 {/* Laat column — red pill + overtime time if late, empty if not */}
                 <span className="bm-user-late-cell">
-                  {u.overtimeTeam
-                    ? <><span className="bm-admin-late-pill">Laat</span><span className="bm-admin-overtime" style={{ marginLeft: 5 }}>{fmtOver(overMs)}</span></>
+                  {isLate
+                    ? <><span className="bm-admin-late-pill">Laat</span>{overMs > 0 && <span className="bm-admin-overtime" style={{ marginLeft: 5 }}>{fmtOver(overMs)}</span>}</>
                     : null
                   }
                 </span>

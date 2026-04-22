@@ -588,12 +588,21 @@
         padding: 9px 14px; background: var(--bg); border-radius: 8px;
         font-size: 13px;
       }
-      /* Admin action rows use flex so the timestamp pill stays compact on the right */
-      .bm-admin-row-admin {
-        display: flex; align-items: center; gap: 10px;
+      /* Admin action rows and pending/request rows use flex — variable content */
+      .bm-admin-row-admin,
+      .bm-pending-row,
+      .bm-admin-row-request {
+        display: flex !important; align-items: center; gap: 10px;
         background: var(--bg);
       }
-      .bm-dark .bm-admin-row-admin { background: var(--bg); }
+      .bm-admin-row-admin .bm-admin-time { flex: 1; }
+      .bm-pending-row .bm-admin-time,
+      .bm-admin-row-request .bm-admin-time { flex: 1; }
+      /* Active-break rows: naam | type | time | button */
+      .bm-admin-row-active {
+        display: flex !important; align-items: center; gap: 10px;
+      }
+      .bm-admin-row-active .bm-admin-time { flex: 1; }
       .bm-admin-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .bm-admin-type {
         font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
