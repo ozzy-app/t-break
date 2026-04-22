@@ -608,6 +608,15 @@
       .bm-admin-tag-early { background: rgba(84,122,61,0.18); color: var(--sage); }
       .bm-admin-tag-timer { background: var(--border); }
       .bm-admin-tag-leader-ended { background: rgba(197,132,37,0.18); color: var(--brand); }
+      .bm-admin-tag-late {
+        background: #b93a39; color: #fff;
+        font-weight: 700; letter-spacing: 0.04em;
+        animation: bm-late-pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes bm-late-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.75; }
+      }
       .bm-admin-tag-forfeit { background: rgba(185,66,46,0.18); color: var(--danger); }
       .bm-admin-tag-admin {
         font-family: 'Geist Mono'; letter-spacing: 0;

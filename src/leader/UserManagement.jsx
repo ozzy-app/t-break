@@ -158,9 +158,11 @@ function ExportModal({ userId, userName, onClose, notify }) {
   const [to, setTo] = useState(today);
   const [busy, setBusy] = useState(false);
 
+  // Expected durations per break type in seconds (from DEFAULT_TEAM_CONFIG)
+  const EXPECTED_SEC = { brb: 180, short: 900, lunch: 1800 };
+
   const doExport = async () => {
     setBusy(true);
-    // Try by user_id first, fall back to user_name for older logs
     let { data } = await sb.from('logs').select('*')
       .eq('user_id', userId)
       .gte('log_date', from).lte('log_date', to)
@@ -176,15 +178,23 @@ function ExportModal({ userId, userName, onClose, notify }) {
     if (!data?.length) { notify('Geen logs gevonden voor deze periode', 'warn'); return; }
 
     const rows = [
-      ['Datum', 'Type', 'Start', 'Einde', 'Duur (min)', 'Reden'],
-      ...data.map(r => [
-        r.log_date,
-        r.break_type || r.action || '',
-        r.started_at ? new Date(r.started_at).toLocaleString('nl-NL') : '',
-        r.ended_at   ? new Date(r.ended_at).toLocaleString('nl-NL')   : '',
-        r.duration_ms ? (r.duration_ms / 60000).toFixed(1) : '',
-        r.end_reason || r.action || '',
-      ])
+      ['Datum', 'Type', 'Start', 'Einde', 'Duur (min)', 'Reden', 'Laat?', 'Tijd+'],
+      ...data.map(r => {
+        const durMs = r.duration_ms || 0;
+        const expectedMs = (EXPECTED_SEC[r.break_type] || 0) * 1000;
+        const overMs = expectedMs > 0 && durMs > expectedMs ? durMs - expectedMs : 0;
+        const isLate = overMs > 0;
+        return [
+          r.log_date,
+          r.break_type || r.action || '',
+          r.started_at ? new Date(r.started_at).toLocaleString('nl-NL') : '',
+          r.ended_at   ? new Date(r.ended_at).toLocaleString('nl-NL')   : '',
+          durMs ? (durMs / 60000).toFixed(1) : '',
+          r.end_reason || r.action || '',
+          r.break_type ? (isLate ? 'JA' : 'NEE') : '',
+          isLate ? `+${(overMs / 60000).toFixed(1)} min` : '',
+        ];
+      })
     ];
     const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -422,6 +432,8 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                     </div>
                   </div>
                   <div className="bm-um-card-right">
+                    {u.isOnBreak  && <span className="bm-um-state-chip bm-um-state-break">op pauze</span>}
+                    {u.isInQueue  && <span className="bm-um-state-chip bm-um-state-queue">wachtrij</span>}
                     {!u.approved
                       ? <span className="bm-um-pending-badge">In afwachting</span>
                       : u.team
@@ -431,8 +443,6 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                         </span>
                       : <span className="bm-um-no-team">Geen team</span>
                     }
-                    {u.isOnBreak  && <span className="bm-um-state-chip bm-um-state-break">op pauze</span>}
-                    {u.isInQueue  && <span className="bm-um-state-chip bm-um-state-queue">wachtrij</span>}
                     <span className="bm-um-expand-arrow">{expandedUser === u.id ? '▲' : '▼'}</span>
                   </div>
                 </div>
@@ -592,7 +602,17 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                                         {' → '}{e.ended_at ? new Date(e.ended_at).toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' }) : '–'}
                                         {e.duration_ms ? ` (${fmtMs(e.duration_ms)})` : ''}
                                       </span>
-                                      <span className={`bm-admin-tag bm-admin-tag-${e.end_reason}`}>{e.end_reason}</span>
+                                      {(() => {
+                                        const EXPECTED = { brb: 180000, short: 900000, lunch: 1800000 };
+                                        const exp = EXPECTED[e.break_type] || 0;
+                                        const dur = e.duration_ms || 0;
+                                        const over = exp > 0 && dur > exp ? dur - exp : 0;
+                                        return over > 0
+                                          ? <span className="bm-admin-tag bm-admin-tag-late" title={`+${fmtMs(over)} over tijd`}>
+                                              LAAT +{fmtMs(over)}
+                                            </span>
+                                          : <span className={`bm-admin-tag bm-admin-tag-${e.end_reason}`}>{e.end_reason}</span>;
+                                      })()}
                                     </li>
                               ))}
                             </ul>

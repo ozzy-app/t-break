@@ -26,6 +26,24 @@ const endReasonText = {
   'leader-ended': 'beëindigd',
 };
 
+const EXPECTED_MS = { brb: 180000, short: 900000, lunch: 1800000 };
+
+function BreakTag({ type, endReason, startedAt, endedAt }) {
+  if (!endedAt || !startedAt) {
+    return <span className={`bm-admin-tag bm-admin-tag-${endReason}`}>{endReasonText[endReason] || endReason}</span>;
+  }
+  const durMs = endedAt - startedAt;
+  const exp = EXPECTED_MS[type] || 0;
+  const overMs = exp > 0 && durMs > exp ? durMs - exp : 0;
+  if (overMs > 0) {
+    const m = Math.floor(overMs / 60000);
+    const s = Math.floor((overMs % 60000) / 1000);
+    const label = m > 0 ? `LAAT +${m}m${s > 0 ? `${s}s` : ''}` : `LAAT +${s}s`;
+    return <span className="bm-admin-tag bm-admin-tag-late" title="Werknemer was te laat terug">{label}</span>;
+  }
+  return <span className={`bm-admin-tag bm-admin-tag-${endReason}`}>{endReasonText[endReason] || endReason}</span>;
+}
+
 function TeamPill({ team }) {
   if (!team) return null;
   return (
@@ -146,9 +164,7 @@ export function ArchiveViewer({ date, log, onClose }) {
                     ? new Date(e.endedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
                     : '–'}
                 </span>
-                <span className={`bm-admin-tag bm-admin-tag-${e.endReason}`}>
-                  {endReasonText[e.endReason] || e.endReason}
-                </span>
+                <BreakTag type={e.type} endReason={e.endReason} startedAt={e.startedAt} endedAt={e.endedAt} />
               </li>
             )
           )}
@@ -188,9 +204,7 @@ export function LogToday({ log }) {
                     ? new Date(e.endedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
                     : '–'}
                 </span>
-                <span className={`bm-admin-tag bm-admin-tag-${e.endReason}`}>
-                  {endReasonText[e.endReason] || e.endReason}
-                </span>
+                <BreakTag type={e.type} endReason={e.endReason} startedAt={e.startedAt} endedAt={e.endedAt} />
               </li>
             )
           )}
