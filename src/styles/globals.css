@@ -581,82 +581,92 @@
         font-size: 13px; color: var(--ink-3); text-align: center;
       }
       .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+
+      /* ── Break log rows: 10-column fixed grid ──────────────────────
+         naam | team | log tekst | flex | type | start | einde | status | overtime | logtijd
+         ─────────────────────────────────────────────────────────── */
       .bm-admin-row {
         display: grid;
-        grid-template-columns: 100px 90px 52px 1fr 72px 70px;
-        align-items: center; gap: 8px;
-        padding: 9px 14px; background: var(--bg); border-radius: 8px;
+        grid-template-columns:
+          100px   /* naam */
+          80px    /* team pill */
+          52px    /* break type pill */
+          1fr     /* log text / spacer */
+          58px    /* start time */
+          58px    /* end time */
+          82px    /* status pill (vroeg/timer/beëindigd) */
+          56px    /* LAAT pill */
+          60px    /* overtime +Xm */
+          52px    /* log time */
+        ;
+        align-items: center; gap: 6px;
+        padding: 8px 14px; background: var(--bg); border-radius: 8px;
         font-size: 13px;
       }
-      /* Admin action rows and pending/request rows use flex — variable content */
+
+      /* Admin action rows — flex, variable content, timestamp right-aligned */
       .bm-admin-row-admin,
       .bm-pending-row,
-      .bm-admin-row-request {
+      .bm-admin-row-request,
+      .bm-admin-row-active {
         display: flex !important; align-items: center; gap: 10px;
         background: var(--bg);
       }
-      .bm-admin-row-admin .bm-admin-time { flex: 1; }
+      .bm-admin-row-admin .bm-admin-time-action,
       .bm-pending-row .bm-admin-time,
-      .bm-admin-row-request .bm-admin-time { flex: 1; }
-      /* Active-break rows: naam | type | time | button */
-      .bm-admin-row-active {
-        display: flex !important; align-items: center; gap: 10px;
-      }
+      .bm-admin-row-request .bm-admin-time,
       .bm-admin-row-active .bm-admin-time { flex: 1; }
-      .bm-admin-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .bm-admin-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+      .bm-admin-team { display: flex; align-items: center; } /* team pill cell */
       .bm-admin-type {
-        font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
-        font-weight: 600; padding: 2px 8px; border-radius: 4px;
+        font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+        font-weight: 700; padding: 2px 6px; border-radius: 4px;
         white-space: nowrap; text-align: center;
       }
       .bm-admin-type-brb { background: rgba(22,163,74,0.12); color: var(--sage); }
       .bm-admin-type-short { background: rgba(220,38,38,0.10); color: var(--danger); }
       .bm-admin-type-lunch { background: rgba(220,38,38,0.10); color: var(--danger); }
-      .bm-admin-time { font-family: 'Geist Mono'; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
-      /* Late pill column */
-      .bm-admin-late-pill {
-        font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
-        padding: 2px 7px; border-radius: 4px;
-        background: #b93a39; color: #fff;
-        white-space: nowrap; text-align: center;
+      .bm-admin-log-text { font-size: 12px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+      .bm-admin-time-cell { font-family: 'Geist Mono'; font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+      .bm-admin-time { font-family: 'Geist Mono'; font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+      /* Status pill (vroeg / timer / beëindigd) */
+      .bm-admin-tag {
+        font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+        padding: 2px 6px; border-radius: 4px; color: var(--ink-3);
+        white-space: nowrap; text-align: center; display: inline-block;
       }
-      .bm-admin-late-empty { display: block; } /* placeholder to keep grid aligned */
-      /* Overtime duration column */
+      .bm-admin-tag-early { background: rgba(84,122,61,0.18); color: var(--sage); }
+      .bm-admin-tag-timer { background: var(--border); color: var(--ink-3); }
+      .bm-admin-tag-leader-ended { background: rgba(197,132,37,0.18); color: var(--amber); }
+      .bm-admin-tag-forfeit { background: rgba(185,66,46,0.18); color: var(--danger); }
+      /* LAAT pill */
+      .bm-admin-late-pill {
+        font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+        padding: 2px 6px; border-radius: 4px;
+        background: #b93a39; color: #fff;
+        white-space: nowrap; text-align: center; display: inline-block;
+      }
+      .bm-admin-tag-late { background: #b93a39; color: #fff; font-weight: 700; }
+      /* Overtime cell */
       .bm-admin-overtime {
         font-family: 'Geist Mono'; font-size: 11px; font-weight: 600;
         color: #b93a39; white-space: nowrap;
       }
-      .bm-admin-tag {
-        font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
-        padding: 2px 8px; border-radius: 4px; color: var(--ink-3);
-        white-space: nowrap; text-align: center;
-      }
-      .bm-admin-tag-early { background: rgba(84,122,61,0.18); color: var(--sage); }
-      .bm-admin-tag-timer { background: var(--border); color: var(--ink-3); }
-      .bm-admin-tag-leader-ended { background: rgba(197,132,37,0.18); color: var(--brand); }
-      .bm-admin-tag-late {
-        background: #b93a39; color: #fff;
-        font-weight: 700; letter-spacing: 0.04em;
-      }
-      .bm-admin-tag-forfeit { background: rgba(185,66,46,0.18); color: var(--danger); }
+      /* Log timestamp (rightmost) */
       .bm-admin-tag-admin {
-        font-family: 'Geist Mono'; letter-spacing: 0; font-size: 11px;
+        font-family: 'Geist Mono'; font-size: 10px;
         background: rgba(99,102,241,0.10); color: #6366f1;
-        padding: 2px 8px; border-radius: 4px; white-space: nowrap;
+        padding: 2px 6px; border-radius: 4px; white-space: nowrap;
         margin-left: auto; flex-shrink: 0;
       }
       .bm-dark .bm-admin-tag-admin { background: rgba(165,180,252,0.12); color: #a5b4fc; }
-      .bm-admin-time-action { font-style: italic; color: var(--ink-2); flex: 1; }
+      .bm-admin-time-action { font-style: italic; color: var(--ink-2); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
       /* Users table late cell */
       .bm-user-late-cell { display: flex; align-items: center; gap: 4px; }
 
-      .bm-admin-type-reset {
-        background: rgba(99,102,241,0.12); color: #6366f1;
-        font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
-        font-weight: 600; padding: 2px 8px; border-radius: 4px;
-      }
-      .bm-dark .bm-admin-type-reset { background: rgba(165,180,252,0.12); color: #a5b4fc; }
+      .bm-admin-type-reset { background: var(--bg-2); color: var(--ink-2); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+      .bm-dark .bm-admin-type-reset { background: var(--bg-2); color: var(--ink-3); }
       /* Default config bar */
       .bm-default-bar {
         display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -794,18 +804,30 @@
         list-style: none; margin: 0; padding: 6px;
         max-height: 280px; overflow-y: auto;
       }
+      .bm-cal-item {
+        display: flex; align-items: center; gap: 4px; border-radius: 8px;
+        transition: background 0.12s;
+      }
+      .bm-cal-item:hover { background: var(--bg-2); }
       .bm-cal-day {
-        width: 100%; text-align: left; padding: 9px 12px;
+        flex: 1; text-align: left; padding: 9px 12px;
         border-radius: 8px; border: 0; background: transparent;
         font: 500 13px 'Geist'; color: var(--ink); cursor: pointer;
-        transition: background 0.12s;
+        transition: color 0.12s;
         display: flex; align-items: center; gap: 8px;
       }
-      .bm-cal-day:hover { background: var(--bg); }
-      .bm-cal-day-active { background: var(--bg) !important; color: var(--brand); font-weight: 600; }
-      .bm-cal-day::before {
-        content: '📋'; font-size: 13px; flex-shrink: 0;
+      .bm-cal-item:hover .bm-cal-day { color: var(--brand); text-decoration: underline; }
+      .bm-cal-day-active { color: var(--brand) !important; font-weight: 600; }
+      .bm-cal-day::before { content: '📋'; font-size: 13px; flex-shrink: 0; }
+      /* Export button next to each date */
+      .bm-cal-export-btn {
+        width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+        border: 1px solid var(--border); background: var(--bg);
+        color: var(--ink-2); cursor: pointer; font-size: 13px; font-weight: 600;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.15s; margin-right: 6px;
       }
+      .bm-cal-export-btn:hover { border-color: var(--brand); color: var(--brand); }
 
       /* Archive section */
       .bm-archive-section { border: 1px solid var(--border); border-radius: 12px; padding: 16px; }

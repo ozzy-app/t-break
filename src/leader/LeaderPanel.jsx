@@ -38,6 +38,7 @@ export function LeaderPanel({
           )}
           <CalendarButton
             onOpenArchive={(d, log) => { setArchiveDate(d); setArchiveLog(log); }}
+            notify={notify}
           />
           <button
             className={`bm-cal-btn ${controlsOpen ? '' : 'bm-cal-btn-active'}`}
@@ -113,6 +114,7 @@ export function LeaderPanel({
           date={archiveDate}
           log={archiveLog}
           onClose={() => { setArchiveDate(null); setArchiveLog(null); }}
+          notify={notify}
         />
 
         <LogToday log={state.log} />
