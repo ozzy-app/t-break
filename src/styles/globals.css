@@ -391,6 +391,7 @@
       .t-active-wrap, .t-offer-wrap {
         display: flex; flex-direction: column; align-items: center;
         gap: 16px; padding: 8px 0 4px;
+        position: relative; z-index: 10;
       }
       .t-timer {
         display: flex; flex-direction: column; align-items: center; gap: 4px;

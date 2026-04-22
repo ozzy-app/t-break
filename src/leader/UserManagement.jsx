@@ -29,17 +29,23 @@ export function UserManagement({ state, me, pendingUsers, onApprove, onAssignLea
     return () => ch.unsubscribe();
   }, []);
 
-  const loadUserLog = async (userId) => {
+  const loadUserLog = async (userId, userName) => {
     if (userLogs[userId]) return;
-    const { data } = await sb.from('logs').select('*').eq('user_id', userId)
+    // Query by id (new logs) OR by name (older logs before the fix)
+    let { data } = await sb.from('logs').select('*').eq('user_id', userId)
       .order('started_at', { ascending: false }).limit(50);
+    if (!data?.length) {
+      const byName = await sb.from('logs').select('*').eq('user_name', userName)
+        .order('started_at', { ascending: false }).limit(50);
+      data = byName.data;
+    }
     setUserLogs(prev => ({ ...prev, [userId]: data || [] }));
   };
 
-  const toggleExpand = async (userId) => {
+  const toggleExpand = async (userId, userName) => {
     if (expandedUser === userId) { setExpandedUser(null); return; }
     setExpandedUser(userId);
-    await loadUserLog(userId);
+    await loadUserLog(userId, userName);
   };
 
   const deleteUser = async (profileId, userName) => {
@@ -51,7 +57,8 @@ export function UserManagement({ state, me, pendingUsers, onApprove, onAssignLea
   };
 
   const sendReset = async (email, name) => {
-    const { error } = await sb.auth.resetPasswordForEmail(email);
+    const redirectTo = `${window.location.origin}/`;
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) { notify?.('Fout: ' + error.message, 'warn'); }
     else { notify?.(`Wachtwoord-reset gestuurd naar ${name}`, 'ok'); }
   };
@@ -132,7 +139,7 @@ export function UserManagement({ state, me, pendingUsers, onApprove, onAssignLea
           <div className="bm-um-list">
             {searched.map(u => (
               <div key={u.id} className="bm-um-card">
-                <div className="bm-um-card-head" onClick={() => toggleExpand(u.id)}>
+                <div className="bm-um-card-head" onClick={() => toggleExpand(u.id, u.name)}>
                   <div className="bm-um-card-left">
                     <span className={`bm-um-status-dot ${u.isOnline ? 'bm-um-status-online' : 'bm-um-status-offline'}`} />
                     {u.isLeader && <span className="bm-um-crown">♛</span>}
@@ -273,10 +280,22 @@ function ExportModal({ userId, userName, onClose, notify }) {
 
   const doExport = async (fmt) => {
     setBusy(true);
-    const { data, error } = await sb.from('logs').select('*')
+    // Try by user_id first (new logs), fall back to user_name (old logs)
+    let { data, error } = await sb.from('logs').select('*')
       .eq('user_id', userId)
       .gte('log_date', from).lte('log_date', to)
       .order('started_at', { ascending: true });
+
+    // If no results by id (pre-fix logs), try by name
+    if (!data?.length) {
+      const byName = await sb.from('logs').select('*')
+        .eq('user_name', userName)
+        .gte('log_date', from).lte('log_date', to)
+        .order('started_at', { ascending: true });
+      data = byName.data;
+      error = byName.error;
+    }
+
     setBusy(false);
     if (error || !data?.length) {
       notify?.('Geen logs gevonden voor deze periode', 'warn');

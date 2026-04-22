@@ -35,7 +35,8 @@ function UserActionsModal({ u, state, me, onClose, onAssignTeam, onAssignLeader,
 
   const sendPasswordReset = async () => {
     setBusy(true);
-    const { error } = await sb.auth.resetPasswordForEmail(u.email);
+    const redirectTo = `${window.location.origin}/`;
+    const { error } = await sb.auth.resetPasswordForEmail(u.email, { redirectTo });
     setBusy(false);
     if (error) { notify?.('Fout: ' + error.message, 'warn'); }
     else { notify?.(`Wachtwoord-reset gestuurd naar ${u.email}`, 'ok'); onClose(); }

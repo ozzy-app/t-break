@@ -117,6 +117,7 @@ export async function insertLog(entry) {
           }
         : {
             ...base,
+            user_id: entry.userId,
             user_name: entry.userName,
             break_type: entry.type,
             started_at: new Date(entry.startedAt).toISOString(),
@@ -235,15 +236,11 @@ export function cleanup(state) {
     // up and the admin see who's still out.
     t.activeBreaks = t.activeBreaks || [];
 
-    // Offer queue slots — overrun breaks don't count against active capacity,
-    // so the queue can advance even if someone is overrun.
+    // Offer queue slots — overrun breaks STILL occupy their slot.
+    // A queue slot only opens when someone actually ends their break.
     for (const type of Object.keys(TYPES)) {
       const cap = t.config[TYPES[type].poolKey];
-      const activeCnt = t.activeBreaks.filter((b) => {
-        if (b.type !== type) return false;
-        const dur = t.config[TYPES[type].durKey];
-        return now < b.startedAt + dur * 1000; // only count non-overrun
-      }).length;
+      const activeCnt = t.activeBreaks.filter((b) => b.type === type).length; // all breaks count
       const offered = t.queues[type].filter((q) => q.offeredAt).length;
       let slots = Math.max(0, cap - activeCnt - offered);
       for (let i = 0; i < t.queues[type].length && slots > 0; i++) {

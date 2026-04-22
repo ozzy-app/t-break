@@ -233,6 +233,17 @@ export function useAppState(me, setMe, notify) {
         notify('Geen ticket om te claimen', 'warn');
         return null;
       }
+      // Hard capacity check — overrun breaks still occupy slots
+      const activeCnt = t.activeBreaks.filter((b) => b.type === type).length;
+      if (activeCnt >= t.config[TYPES[type].poolKey]) {
+        // Slot no longer available (someone claimed it first, or overrun occupies it)
+        // Remove the stale offer so the UI updates
+        t.queues[type] = t.queues[type].map((q) =>
+          q.userId === me.userId ? { ...q, offeredAt: undefined } : q
+        );
+        notify('Ticket niet meer beschikbaar, je staat nog in de wachtrij', 'warn');
+        return s;
+      }
       const { dailyKey, dailyLimKey } = TYPES[type];
       if (dailyKey && dailyLimKey) {
         const usage = t.usage[me.userId] || { date: todayStr(), short: 0, lunch: 0 };

@@ -15,9 +15,9 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
     <section className="t-active-wrap">
       <div
         className={`t-ticket t-landscape t-col-${myBreak.type} ${over ? 't-ticket-over' : ''}`}
-        onClick={onEnd}
-        style={{ cursor: 'pointer' }}
-        title="Klik om pauze te beëindigen"
+        onClick={over ? undefined : onEnd}
+        style={{ cursor: over ? 'default' : 'pointer' }}
+        title={over ? '' : 'Klik om pauze te beëindigen'}
       >
         <div className="t-body-l">
           <div className="t-brand-l">T-BREAK</div>
@@ -32,10 +32,7 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
           <div className="t-stub-l-top">{over ? 'OVERTIJD' : 'ACTIEF'}</div>
           <div className="t-stub-l-name">{myBreak.userName}</div>
           <div className="t-stub-l-bar">
-            <div
-              className="t-stub-l-bar-fill"
-              style={{ width: `${over ? 100 : pct}%` }}
-            />
+            <div className="t-stub-l-bar-fill" style={{ width: `${over ? 100 : pct}%` }} />
           </div>
         </div>
       </div>
@@ -48,7 +45,11 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
             ? 'Je bent over tijd — keer nu terug'
             : `Terug om ${new Date(endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
         </div>
-        <button className="bm-btn bm-btn-primary bm-btn-lg" onClick={onEnd}>
+        {/* Always rendered, always clickable — explicit stopPropagation so the card's onClick can't interfere */}
+        <button
+          className="bm-btn bm-btn-primary bm-btn-lg"
+          onClick={(e) => { e.stopPropagation(); onEnd(); }}
+        >
           Ik ben terug
         </button>
       </div>
