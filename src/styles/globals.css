@@ -580,33 +580,47 @@
         padding: 14px; background: var(--bg); border-radius: 8px;
         font-size: 13px; color: var(--ink-3); text-align: center;
       }
-      .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+      .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
       .bm-admin-row {
-        display: flex; align-items: center; gap: 12px;
-        padding: 10px 14px; background: var(--bg); border-radius: 8px;
-        font-size: 13px; flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 100px 90px 52px 1fr 72px 70px;
+        align-items: center; gap: 8px;
+        padding: 9px 14px; background: var(--bg); border-radius: 8px;
+        font-size: 13px;
       }
-      .bm-admin-name { font-weight: 500; min-width: 80px; }
+      .bm-admin-row-admin {
+        grid-template-columns: 100px 90px 1fr 70px;
+      }
+      .bm-admin-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .bm-admin-type {
         font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
         font-weight: 600; padding: 2px 8px; border-radius: 4px;
+        white-space: nowrap; text-align: center;
       }
-      .bm-admin-type-brb {
-        background: rgba(22,163,74,0.12); color: var(--sage);
+      .bm-admin-type-brb { background: rgba(22,163,74,0.12); color: var(--sage); }
+      .bm-admin-type-short { background: rgba(220,38,38,0.10); color: var(--danger); }
+      .bm-admin-type-lunch { background: rgba(220,38,38,0.10); color: var(--danger); }
+      .bm-admin-time { font-family: 'Geist Mono'; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+      /* Late pill column */
+      .bm-admin-late-pill {
+        font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
+        padding: 2px 7px; border-radius: 4px;
+        background: #b93a39; color: #fff;
+        white-space: nowrap; text-align: center;
       }
-      .bm-admin-type-short {
-        background: rgba(220,38,38,0.10); color: var(--danger);
+      .bm-admin-late-empty { display: block; } /* placeholder to keep grid aligned */
+      /* Overtime duration column */
+      .bm-admin-overtime {
+        font-family: 'Geist Mono'; font-size: 11px; font-weight: 600;
+        color: #b93a39; white-space: nowrap;
       }
-      .bm-admin-type-lunch {
-        background: rgba(220,38,38,0.10); color: var(--danger);
-      }
-      .bm-admin-time { font-family: 'Geist Mono'; font-size: 12px; color: var(--ink-2); flex: 1; }
       .bm-admin-tag {
         font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
         padding: 2px 8px; border-radius: 4px; color: var(--ink-3);
+        white-space: nowrap; text-align: center;
       }
       .bm-admin-tag-early { background: rgba(84,122,61,0.18); color: var(--sage); }
-      .bm-admin-tag-timer { background: var(--border); }
+      .bm-admin-tag-timer { background: var(--border); color: var(--ink-3); }
       .bm-admin-tag-leader-ended { background: rgba(197,132,37,0.18); color: var(--brand); }
       .bm-admin-tag-late {
         background: #b93a39; color: #fff;
@@ -624,15 +638,7 @@
       }
       .bm-dark .bm-admin-tag-admin { background: rgba(165,180,252,0.12); color: #a5b4fc; }
 
-      .bm-admin-row-admin {
-        background: rgba(99,102,241,0.04);
-        border-left: 2px solid rgba(99,102,241,0.35);
-      }
-      .bm-dark .bm-admin-row-admin {
-        background: rgba(165,180,252,0.04);
-        border-left-color: rgba(165,180,252,0.3);
-      }
-      .bm-admin-time-action { font-style: italic; }
+      .bm-admin-time-action { font-style: italic; color: var(--ink-2); }
 
       .bm-admin-type-reset {
         background: rgba(99,102,241,0.12); color: #6366f1;

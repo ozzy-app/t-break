@@ -28,20 +28,19 @@ const endReasonText = {
 
 const EXPECTED_MS = { brb: 180000, short: 900000, lunch: 1800000 };
 
-function BreakTag({ type, endReason, startedAt, endedAt }) {
-  if (!endedAt || !startedAt) {
-    return <span className={`bm-admin-tag bm-admin-tag-${endReason}`}>{endReasonText[endReason] || endReason}</span>;
-  }
+// Returns { isLate, overMs } for a completed break
+function calcLate(type, startedAt, endedAt) {
+  if (!endedAt || !startedAt || !type) return { isLate: false, overMs: 0 };
   const durMs = endedAt - startedAt;
   const exp = EXPECTED_MS[type] || 0;
   const overMs = exp > 0 && durMs > exp ? durMs - exp : 0;
-  if (overMs > 0) {
-    const m = Math.floor(overMs / 60000);
-    const s = Math.floor((overMs % 60000) / 1000);
-    const label = m > 0 ? `LAAT +${m}m${s > 0 ? `${s}s` : ''}` : `LAAT +${s}s`;
-    return <span className="bm-admin-tag bm-admin-tag-late" title="Werknemer was te laat terug">{label}</span>;
-  }
-  return <span className={`bm-admin-tag bm-admin-tag-${endReason}`}>{endReasonText[endReason] || endReason}</span>;
+  return { isLate: overMs > 0, overMs };
+}
+
+function fmtOver(ms) {
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return m > 0 ? `+${m}m${s > 0 ? `${s}s` : ''}` : `+${s}s`;
 }
 
 function TeamPill({ team }) {
@@ -156,15 +155,25 @@ export function ArchiveViewer({ date, log, onClose }) {
             ) : (
               <li key={i} className="bm-admin-row">
                 <span className="bm-admin-name">{e.userName}</span>
+                <TeamPill team={e.team} />
                 <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label}</span>
                 <span className="bm-admin-time">
                   {new Date(e.startedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
                   {' → '}
-                  {e.endedAt
-                    ? new Date(e.endedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
-                    : '–'}
+                  {e.endedAt ? new Date(e.endedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) : '–'}
                 </span>
-                <BreakTag type={e.type} endReason={e.endReason} startedAt={e.startedAt} endedAt={e.endedAt} />
+                {(() => {
+                  const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
+                  return isLate
+                    ? <span className="bm-admin-late-pill">Laat</span>
+                    : <span className="bm-admin-tag bm-admin-tag-early">{endReasonText[e.endReason] || e.endReason || '—'}</span>;
+                })()}
+                {(() => {
+                  const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
+                  return isLate
+                    ? <span className="bm-admin-overtime">{fmtOver(overMs)}</span>
+                    : <span />;
+                })()}
               </li>
             )
           )}
@@ -200,11 +209,20 @@ export function LogToday({ log }) {
                 <span className="bm-admin-time">
                   {new Date(e.startedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
                   {' → '}
-                  {e.endedAt
-                    ? new Date(e.endedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
-                    : '–'}
+                  {e.endedAt ? new Date(e.endedAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) : '–'}
                 </span>
-                <BreakTag type={e.type} endReason={e.endReason} startedAt={e.startedAt} endedAt={e.endedAt} />
+                {(() => {
+                  const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
+                  return isLate
+                    ? <span className="bm-admin-late-pill">Laat</span>
+                    : <span className="bm-admin-tag bm-admin-tag-early">{endReasonText[e.endReason] || e.endReason || '—'}</span>;
+                })()}
+                {(() => {
+                  const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
+                  return isLate
+                    ? <span className="bm-admin-overtime">{fmtOver(overMs)}</span>
+                    : <span />;
+                })()}
               </li>
             )
           )}
