@@ -7,6 +7,7 @@ export function TeamControls({ state, onUpdateConfig, onSetDefault, onLoadDefaul
       {TEAMS.map((team) => {
         const td = state.teams[team];
         const def = state.defaultConfigs?.[team];
+        const hasDefault = !!def;
         return (
           <div key={team} className="bm-leader-section">
             <div className="bm-team-ctrl-header">
@@ -40,20 +41,23 @@ export function TeamControls({ state, onUpdateConfig, onSetDefault, onLoadDefaul
                   </button>
                 </div>
               ))}
-            </div>
-            <div className="bm-default-bar">
-              <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => onSetDefault(team)}>
-                Sla op als standaard
+              <button
+                className={`bm-save-default-btn ${hasDefault ? 'bm-saved' : ''}`}
+                onClick={() => onSetDefault(team)}
+                title={hasDefault
+                  ? `Huidige standaard: BRB ${def.brbPool} · Short ${def.shortPool} · Lunch ${def.lunchPool} — klik om te overschrijven`
+                  : 'Sla huidige instellingen op als standaard'}
+              >
+                💾
               </button>
-              {def && (
-                <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => onLoadDefault(team)}>
-                  Laad standaard
+              {hasDefault && (
+                <button
+                  className="bm-btn bm-btn-ghost bm-btn-sm"
+                  onClick={() => onLoadDefault(team)}
+                  title={`Laad standaard: BRB ${def.brbPool} · Short ${def.shortPool} · Lunch ${def.lunchPool}`}
+                >
+                  ↺ Laad standaard
                 </button>
-              )}
-              {def && (
-                <span className="bm-default-hint">
-                  BRB {def.brbPool} · Kort {def.shortPool} · Lunch {def.lunchPool}
-                </span>
               )}
             </div>
           </div>

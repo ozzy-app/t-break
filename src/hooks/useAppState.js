@@ -442,6 +442,14 @@ export function useAppState(me, setMe, notify) {
       return fresh;
     });
 
+  const clearLog = () =>
+    act(async (s) => {
+      const entry = { kind: 'admin', action: 'clear-log', adminName: me.name, at: Date.now() };
+      await insertLog(entry);
+      s.log = [entry]; // wipe today's in-memory log, keep only this marker
+      return s;
+    });
+
   // Employee self team-switch (once per day, or creates request)
   const requestTeamSwitch = async (toTeam) => {
     if (!me) return;
@@ -515,6 +523,7 @@ export function useAppState(me, setMe, notify) {
     assignLeader,
     assignTeam,
     resetAll,
+    clearLog,
     requestTeamSwitch,
   };
 }

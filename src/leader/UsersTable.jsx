@@ -8,6 +8,7 @@ export function UsersTable({
   onRemoveExtraBreak,
   onAssignLeader,
   onAssignTeam,
+  onOpenUserMgmt,
 }) {
   const sessions = state.sessions || {};
   const totalTime = state.totalTime || {};
@@ -46,8 +47,19 @@ export function UsersTable({
 
   return (
     <div className="bm-leader-section">
-      <h3 className="bm-leader-h3">
-        Gebruikers <span className="bm-leader-h3-count">{users.length}</span>
+      <h3 className="bm-leader-h3" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span>
+          Gebruikers <span className="bm-leader-h3-count">{users.length}</span>
+        </span>
+        {onOpenUserMgmt && (
+          <button
+            className="bm-users-mgmt-btn"
+            onClick={onOpenUserMgmt}
+            title="Open gebruikersbeheer"
+          >
+            👥 Beheer alle gebruikers
+          </button>
+        )}
       </h3>
       {users.length === 0 ? (
         <div className="bm-empty">Nog geen gebruikers.</div>

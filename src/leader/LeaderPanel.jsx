@@ -8,14 +8,16 @@ import { CalendarButton, ArchiveViewer, LogToday } from './ArchiveViewer';
 
 export function LeaderPanel({
   state, me,
-  onUpdateConfig, onEndBreak, onReset,
+  onUpdateConfig, onEndBreak, onReset, onClearLog,
   onGrantExtraBreak, onRemoveExtraBreak,
   onAssignLeader, onAssignTeam,
   onSetDefault, onLoadDefault,
   pendingUsers, teamRequests,
   onApprove, onApproveTeam, onDenyTeam,
+  onOpenUserMgmt,
 }) {
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmClearLog, setConfirmClearLog] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(true);
   const [archiveDate, setArchiveDate] = useState(null);
   const [archiveLog, setArchiveLog] = useState(null);
@@ -94,6 +96,7 @@ export function LeaderPanel({
           onRemoveExtraBreak={onRemoveExtraBreak}
           onAssignLeader={onAssignLeader}
           onAssignTeam={onAssignTeam}
+          onOpenUserMgmt={onOpenUserMgmt}
         />
 
         <ArchiveViewer
@@ -118,10 +121,28 @@ export function LeaderPanel({
                 Annuleren
               </button>
             </div>
+          ) : confirmClearLog ? (
+            <div className="bm-reset-confirm">
+              <span>Logboek van vandaag wissen? Archief blijft behouden.</span>
+              <button
+                className="bm-btn bm-btn-danger"
+                onClick={() => { onClearLog(); setConfirmClearLog(false); }}
+              >
+                Ja, wissen
+              </button>
+              <button className="bm-btn bm-btn-ghost" onClick={() => setConfirmClearLog(false)}>
+                Annuleren
+              </button>
+            </div>
           ) : (
-            <button className="bm-btn bm-btn-ghost" onClick={() => setConfirmReset(true)}>
-              Alles resetten
-            </button>
+            <>
+              <button className="bm-btn bm-btn-ghost" onClick={() => setConfirmReset(true)}>
+                Alles resetten
+              </button>
+              <button className="bm-btn bm-btn-ghost" onClick={() => setConfirmClearLog(true)}>
+                Logboek wissen
+              </button>
+            </>
           )}
         </div>
       </div>

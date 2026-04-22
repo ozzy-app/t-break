@@ -9,6 +9,7 @@ import { Toast } from './components/Toast';
 import { UsageFooter } from './components/UsageFooter';
 import { LeaderPanel } from './leader/LeaderPanel';
 import { TeamSection } from './leader/TeamSection';
+import { UserManagement } from './leader/UserManagement';
 import { useAuth } from './hooks/useAuth';
 import { useAppState } from './hooks/useAppState';
 import { useAdminData } from './hooks/useAdminData';
@@ -24,6 +25,7 @@ import { todayStr } from './lib/helpers';
 export default function App() {
   const { me, setMe, authChecked, signOut, toggleLeader } = useAuth();
   const [toast, setToast] = useState(null);
+  const [userMgmtOpen, setUserMgmtOpen] = useState(false);
 
   const notify = (message, tone = 'info') => setToast({ message, tone });
 
@@ -41,7 +43,7 @@ export default function App() {
     claimOffer, declineOffer,
     updateConfig, setDefaultConfig, loadDefaultConfig,
     grantExtraBreak, removeExtraBreak,
-    assignLeader, assignTeam, resetAll,
+    assignLeader, assignTeam, resetAll, clearLog,
     requestTeamSwitch,
   } = appState;
 
@@ -188,24 +190,40 @@ export default function App() {
 
           {me.isLeader && (
             <aside className="bm-leader-aside">
-              <LeaderPanel
-                state={state}
-                me={me}
-                onUpdateConfig={updateConfig}
-                onEndBreak={endBreakFor}
-                onReset={resetAll}
-                onGrantExtraBreak={grantExtraBreak}
-                onRemoveExtraBreak={removeExtraBreak}
-                onAssignLeader={assignLeader}
-                onAssignTeam={assignTeam}
-                onSetDefault={setDefaultConfig}
-                onLoadDefault={loadDefaultConfig}
-                pendingUsers={admin.pendingUsers}
-                teamRequests={admin.teamRequests}
-                onApprove={(id, makeLeader) => admin.approveUser(id, makeLeader, act)}
-                onApproveTeam={(req) => admin.approveTeamRequest(req, act)}
-                onDenyTeam={admin.denyTeamRequest}
-              />
+              {userMgmtOpen ? (
+                <UserManagement
+                  state={state}
+                  me={me}
+                  pendingUsers={admin.pendingUsers}
+                  onApprove={(id, makeLeader) => admin.approveUser(id, makeLeader, act)}
+                  onAssignLeader={assignLeader}
+                  onAssignTeam={assignTeam}
+                  onGrantExtraBreak={grantExtraBreak}
+                  onRemoveExtraBreak={removeExtraBreak}
+                  onBack={() => setUserMgmtOpen(false)}
+                />
+              ) : (
+                <LeaderPanel
+                  state={state}
+                  me={me}
+                  onUpdateConfig={updateConfig}
+                  onEndBreak={endBreakFor}
+                  onReset={resetAll}
+                  onClearLog={clearLog}
+                  onGrantExtraBreak={grantExtraBreak}
+                  onRemoveExtraBreak={removeExtraBreak}
+                  onAssignLeader={assignLeader}
+                  onAssignTeam={assignTeam}
+                  onSetDefault={setDefaultConfig}
+                  onLoadDefault={loadDefaultConfig}
+                  pendingUsers={admin.pendingUsers}
+                  teamRequests={admin.teamRequests}
+                  onApprove={(id, makeLeader) => admin.approveUser(id, makeLeader, act)}
+                  onApproveTeam={(req) => admin.approveTeamRequest(req, act)}
+                  onDenyTeam={admin.denyTeamRequest}
+                  onOpenUserMgmt={() => setUserMgmtOpen(true)}
+                />
+              )}
             </aside>
           )}
         </div>
