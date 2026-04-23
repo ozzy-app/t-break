@@ -7,6 +7,14 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>T-Break</title>
+    <!-- Apply dark mode before first paint to prevent white flash -->
+    <script>
+      try {
+        if (localStorage.getItem('bm:dark') === '1') {
+          document.documentElement.classList.add('bm-dark');
+        }
+      } catch {}
+    </script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23b93a39'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='18' fill='white'>T</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
