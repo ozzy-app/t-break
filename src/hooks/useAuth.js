@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { sb } from '../lib/supabase';
 import { registerSession } from '../lib/state';
 
+// Promise that resolves after ms milliseconds with null
+const timeout = (ms) => new Promise(res => setTimeout(() => res(null), ms));
+
+// Race a promise against a timeout
+const withTimeout = (promise, ms) => Promise.race([promise, timeout(ms)]);
+
 export function useAuth() {
   const [me, setMe] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -16,26 +22,31 @@ export function useAuth() {
   const applySession = async (session) => {
     if (!session?.user) return false;
     try {
-      const { data: profile, error } = await sb
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
+      // 5s timeout on profile query — don't hang forever
+      const result = await withTimeout(
+        sb.from('profiles').select('*').eq('id', session.user.id).single(),
+        5000
+      );
+
+      if (!result) {
+        console.warn('[auth] Profile query timed out');
+        return false;
+      }
+
+      const { data: profile, error } = result;
 
       if (error) {
-        console.warn('Profile query error:', error.code, error.message);
-        // PGRST116 = not found; anything else could be a permissions/token issue
+        console.warn('[auth] Profile error:', error.code, error.message);
+        // If permissions error (not "row not found"), try token refresh once
         if (error.code !== 'PGRST116') {
-          // Try refreshing the session token and retrying once
-          const { data: refreshed } = await sb.auth.refreshSession();
-          if (refreshed?.session) {
-            const { data: p2 } = await sb
-              .from('profiles')
-              .select('*')
-              .eq('id', refreshed.session.user.id)
-              .single();
-            if (p2?.approved) {
-              const meData = buildMe(refreshed.session.user, p2);
+          const refreshResult = await withTimeout(sb.auth.refreshSession(), 4000);
+          if (refreshResult?.data?.session) {
+            const retry = await withTimeout(
+              sb.from('profiles').select('*').eq('id', refreshResult.data.session.user.id).single(),
+              5000
+            );
+            if (retry?.data?.approved) {
+              const meData = buildMe(refreshResult.data.session.user, retry.data);
               setMe(meData);
               registerSession(meData).catch(() => {});
               return true;
@@ -46,7 +57,7 @@ export function useAuth() {
       }
 
       if (!profile?.approved) {
-        console.warn('Profile not approved for', session.user.id);
+        console.warn('[auth] Not approved');
         return false;
       }
 
@@ -55,64 +66,45 @@ export function useAuth() {
       registerSession(meData).catch(() => {});
       return true;
     } catch (e) {
-      console.error('applySession error:', e);
+      console.error('[auth] applySession threw:', e);
       return false;
     }
   };
 
   useEffect(() => {
-    // Hard cap — never show Laden... for more than 8s
-    const hardTimeout = setTimeout(markChecked, 8000);
-
-    (async () => {
-      try {
-        // First try to get the current session
-        const { data, error } = await sb.auth.getSession();
-
-        if (error) {
-          console.warn('getSession error:', error.message);
-          markChecked();
-          return;
-        }
-
-        if (data?.session) {
-          await applySession(data.session);
-          // Don't sign out if applySession fails — could be transient.
-          // Just let the user see the login screen.
-        }
-      } catch (e) {
-        console.error('restore error:', e);
-      } finally {
-        clearTimeout(hardTimeout);
-        markChecked();
-      }
-    })();
+    // Absolute hard cap — no matter what, clear Laden… after 6s
+    const hardTimeout = setTimeout(() => {
+      console.warn('[auth] Hard timeout hit — forcing authChecked');
+      markChecked();
+    }, 6000);
 
     const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
-      console.log('auth event:', event);
+      console.log('[auth]', event, session?.user?.email ?? 'no user');
 
-      if (event === 'SIGNED_OUT') {
-        setMe(null);
+      if (event === 'INITIAL_SESSION') {
+        if (session) {
+          await applySession(session);
+        }
+        clearTimeout(hardTimeout);
         markChecked();
         return;
       }
 
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        if (session) {
-          await applySession(session);
-        }
+        await applySession(session);
         if (window.location.hash.includes('access_token')) {
           window.history.replaceState(null, '', window.location.pathname);
         }
+        clearTimeout(hardTimeout);
         markChecked();
+        return;
       }
 
-      if (event === 'INITIAL_SESSION') {
-        // Supabase v2 fires this on page load with the stored session
-        if (session) {
-          await applySession(session);
-        }
+      if (event === 'SIGNED_OUT') {
+        setMe(null);
+        clearTimeout(hardTimeout);
         markChecked();
+        return;
       }
     });
 
