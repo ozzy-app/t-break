@@ -26,6 +26,7 @@ export default function App() {
   const { me, setMe, authChecked, signOut, toggleLeader } = useAuth();
   const [toast, setToast] = useState(null);
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
+  const [isEmployeeView, setIsEmployeeView] = useState(false);
 
   const notify = (message, tone = 'info') => setToast({ message, tone });
 
@@ -105,7 +106,9 @@ export default function App() {
       <Header
         me={me}
         onSignOut={signOut}
-        onToggleLeader={toggleLeader}
+        onToggleLeader={() => { toggleLeader(); setIsEmployeeView(v => !v); }}
+        isEmployeeView={isEmployeeView}
+        notify={notify}
         myTeam={myTeam}
         onRequestTeamSwitch={requestTeamSwitch}
       />
@@ -148,9 +151,9 @@ export default function App() {
           </div>
         )}
 
-        <div className={`bm-content ${me.isLeader ? 'bm-content-leader' : ''}`}>
+        <div className={`bm-content ${me.isLeader && !isEmployeeView ? 'bm-content-leader' : ''}`}>
           <div className={`bm-rows ${myActive ? 'bm-rows-dim' : ''}`}>
-            {me.isLeader ? (
+            {me.isLeader && !isEmployeeView ? (
               TEAMS.map((team) => (
                 <TeamSection key={team} team={team} teamData={state.teams[team]} me={me} />
               ))
@@ -188,7 +191,7 @@ export default function App() {
             ) : null}
           </div>
 
-          {me.isLeader && (
+          {me.isLeader && !isEmployeeView && (
             <aside className="bm-leader-aside">
               {userMgmtOpen ? (
                 <UserManagement

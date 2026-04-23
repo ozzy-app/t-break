@@ -19,7 +19,7 @@
         --t-short-fg: #b93a39;
         --t-lunch-bg: #b93a39;
         --t-lunch-fg: #ffffff;
-        --t-brb-bg:   #4f8771;
+        --t-brb-bg:   #08AD8B;
         --t-brb-fg:   #ffffff;
         --t-queue-bg: #ea580c;
         --t-queue-fg: #ffffff;
@@ -45,7 +45,7 @@
         --t-short-fg: #b93a39;
         --t-lunch-bg: #a03332;
         --t-lunch-fg: #ffffff;
-        --t-brb-bg:   #4f8771;
+        --t-brb-bg:   #08AD8B;
         --t-brb-fg:   #ffffff;
         --t-queue-bg: #c2410c;
         --t-queue-fg: #ffffff;
@@ -390,7 +390,7 @@
         line-height: 1; padding: 8px 20px; border-radius: 12px;
         min-width: 90px; text-align: center;
       }
-      .bm-queue-banner-pill-brb   { background: #4f8771; color: #fff; }
+      .bm-queue-banner-pill-brb   { background: #08AD8B; color: #fff; }
       .bm-queue-banner-pill-short { background: #b93a39; color: #1a1a1a; }
       .bm-queue-banner-pill-lunch { background: #b93a39; color: #1a1a1a; }
 
@@ -588,22 +588,21 @@
       }
       .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 
-      /* ── Break log rows: 10-column fixed grid ──────────────────────
-         naam | team | log tekst | flex | type | start | einde | status | overtime | logtijd
+      /* ── Break log rows: 9-column fixed grid ──────────────────────
+         team | naam | type | flex | status | overtime | eindtijd | starttijd | logtijd
          ─────────────────────────────────────────────────────────── */
       .bm-admin-row {
         display: grid;
         grid-template-columns:
-          100px   /* naam */
           80px    /* team pill */
+          110px   /* naam */
           52px    /* break type pill */
           1fr     /* log text / spacer */
-          58px    /* start time */
-          58px    /* end time */
-          82px    /* status pill (vroeg/timer/beëindigd) */
-          56px    /* LAAT pill */
+          80px    /* status pill */
           60px    /* overtime +Xm */
-          52px    /* log time */
+          52px    /* eindtijd */
+          52px    /* starttijd */
+          52px    /* logtijd blue pill */
         ;
         align-items: center; gap: 6px;
         padding: 8px 14px; background: var(--bg); border-radius: 8px;

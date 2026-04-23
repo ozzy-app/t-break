@@ -7,7 +7,7 @@ export const TEAM_LABELS = {
 };
 
 export const TEAM_COLORS = {
-  klantenservice: '#4f8771',
+  klantenservice: '#08AD8B',
   commercieel: '#b93a39',
   freedom: '#ffcc00',
 };
@@ -41,7 +41,7 @@ export const TYPES = {
     dailyLimKey: null,
     ticketLabel: 'BRB',
     useDash: false,
-    color: '#4f8771',
+    color: '#08AD8B',
   },
   short: {
     label: 'Short',

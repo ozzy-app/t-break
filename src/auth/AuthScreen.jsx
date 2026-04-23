@@ -3,9 +3,10 @@ import { sb } from '../lib/supabase';
 import { registerSession } from '../lib/state';
 
 export function AuthScreen({ onAuth }) {
-  const [mode, setMode] = useState('login'); // login | register | pending | mfa
+  const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [name, setName] = useState('');
   const [mfaCode, setMfaCode] = useState('');
   const [mfaFactorId, setMfaFactorId] = useState(null);
@@ -17,12 +18,11 @@ export function AuthScreen({ onAuth }) {
     if (!user) return;
     const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
     if (!profile) {
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise(r => setTimeout(r, 1500));
       const { data: p2 } = await sb.from('profiles').select('*').eq('id', user.id).single();
       if (!p2?.approved) { setMode('pending'); return; }
       const meData = { userId: user.id, name: p2.name, isLeader: p2.is_leader, team: p2.team || null, email: user.email };
-      onAuth(meData); registerSession(meData);
-      return;
+      onAuth(meData); registerSession(meData); return;
     }
     if (!profile.approved) { setMode('pending'); return; }
     const meData = { userId: user.id, name: profile.name, isLeader: profile.is_leader, team: profile.team || null, email: user.email };
@@ -36,7 +36,7 @@ export function AuthScreen({ onAuth }) {
     const { data: aalData } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
     if (aalData?.nextLevel === 'aal2' && aalData.nextLevel !== aalData.currentLevel) {
       const factors = data.user?.factors || [];
-      const totp = factors.find((f) => f.factor_type === 'totp' && f.status === 'verified');
+      const totp = factors.find(f => f.factor_type === 'totp' && f.status === 'verified');
       if (totp) {
         const { data: ch } = await sb.auth.mfa.challenge({ factorId: totp.id });
         setMfaFactorId(totp.id); setMfaChallengeId(ch.id); setMode('mfa');
@@ -80,12 +80,9 @@ export function AuthScreen({ onAuth }) {
         <h1 className="bm-entry-title">Verificatie</h1>
         <p className="bm-entry-sub">Voer de 6-cijferige code in uit je authenticator app.</p>
         {error && <div className="bm-auth-error">{error}</div>}
-        <input
-          className="bm-input bm-input-code" placeholder="000000" value={mfaCode}
-          onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-          onKeyDown={(e) => e.key === 'Enter' && doMfa()}
-          autoFocus maxLength={6}
-        />
+        <input className="bm-input bm-input-code" placeholder="000000" value={mfaCode}
+          onChange={e => setMfaCode(e.target.value.replace(/\D/g,'').slice(0,6))}
+          onKeyDown={e => e.key === 'Enter' && doMfa()} autoFocus maxLength={6} />
         <button className="bm-btn bm-btn-primary bm-btn-lg" onClick={doMfa} disabled={loading || mfaCode.length !== 6}>
           {loading ? 'Controleren…' : 'Bevestigen'}
         </button>
@@ -98,22 +95,27 @@ export function AuthScreen({ onAuth }) {
       <div className="bm-entry">
         <div className="bm-entry-eyebrow">T-BREAK</div>
         <h1 className="bm-entry-title">{mode === 'login' ? 'Inloggen' : 'Account aanmaken'}</h1>
-        <p className="bm-entry-sub">
-          {mode === 'login' ? 'Log in met je werkaccount.' : 'Maak een account aan met je werkmail.'}
-        </p>
+        <p className="bm-entry-sub">{mode === 'login' ? 'Log in met je werkaccount.' : 'Maak een account aan met je werkmail.'}</p>
         {error && <div className="bm-auth-error">{error}</div>}
         {mode === 'register' && (
           <input className="bm-input" placeholder="Jouw naam" value={name}
-            onChange={(e) => setName(e.target.value)} style={{ marginBottom: '12px' }} />
+            onChange={e => setName(e.target.value)} style={{ marginBottom: '12px' }} />
         )}
         <input className="bm-input" placeholder="Werkemail" type="email" value={email}
-          onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: '12px' }} />
-        <input className="bm-input" placeholder="Wachtwoord" type="password" value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && (mode === 'login' ? doLogin() : doRegister())}
-          style={{ marginBottom: '20px' }}
-        />
-        <button className="bm-btn bm-btn-primary bm-btn-lg" onClick={mode === 'login' ? doLogin : doRegister} disabled={loading}>
+          onChange={e => setEmail(e.target.value)} style={{ marginBottom: '12px' }} />
+        {/* Password field with show/hide eye */}
+        <div className="bm-pw-wrap" style={{ marginBottom: '20px' }}>
+          <input className="bm-input" placeholder="Wachtwoord"
+            type={showPw ? 'text' : 'password'} value={password}
+            onChange={e => setPassword(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? doLogin() : doRegister())} />
+          <button className="bm-pw-eye" type="button" tabIndex={-1}
+            onClick={() => setShowPw(v => !v)} title={showPw ? 'Verberg wachtwoord' : 'Toon wachtwoord'}>
+            {showPw ? '🙈' : '👁'}
+          </button>
+        </div>
+        <button className="bm-btn bm-btn-primary bm-btn-lg"
+          onClick={mode === 'login' ? doLogin : doRegister} disabled={loading}>
           {loading ? 'Bezig…' : mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
         </button>
         <button className="bm-auth-switch" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}>

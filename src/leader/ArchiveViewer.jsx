@@ -58,40 +58,44 @@ function fmt2(ts, opts = { hour: '2-digit', minute: '2-digit' }) {
   return new Date(ts).toLocaleTimeString('nl-NL', opts);
 }
 
-// ── Break row: 10-column grid ────────────────────────────────────
-// naam | team | type | spacer | start | einde | status | laat | overtime | logtijd
+// Column order (10 cols):
+// team | naam | type | spacer | status | overtime | eindtijd | starttijd | logtijd(blue)
+// team  naam  type  [flex]  status  overtime  eind  start  logtijd
 function BreakRow({ e }) {
   const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
   return (
     <li className="bm-admin-row">
-      <span className="bm-admin-name">{e.userName}</span>
       <TeamPill team={e.team} />
+      <span className="bm-admin-name">{e.userName}</span>
       <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label || '–'}</span>
-      <span />  {/* spacer / log text */}
-      <span className="bm-admin-time-cell">{fmt2(e.startedAt)}</span>
-      <span className="bm-admin-time-cell">{e.endedAt ? fmt2(e.endedAt) : '–'}</span>
+      <span />
+      {/* status pill */}
       <span>
         {isLate
           ? <span className="bm-admin-late-pill">Laat</span>
-          : <span className="bm-admin-tag bm-admin-tag-early">{endReasonText[e.endReason] || e.endReason || '—'}</span>
+          : <span className={`bm-admin-tag bm-admin-tag-${e.endReason || 'timer'}`}>{endReasonText[e.endReason] || e.endReason || '—'}</span>
         }
       </span>
+      {/* overtime */}
       <span className="bm-admin-overtime">{isLate ? fmtOver(overMs) : ''}</span>
-      <span />  {/* logtijd — in-memory log doesn't store this separately */}
+      {/* eindtijd */}
+      <span className="bm-admin-time-cell">{e.endedAt ? fmt2(e.endedAt) : '–'}</span>
+      {/* starttijd */}
+      <span className="bm-admin-time-cell">{fmt2(e.startedAt)}</span>
+      {/* logtijd — blue pill, same as admin rows */}
+      <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.endedAt || e.startedAt)}</span>
     </li>
   );
 }
 
-// ── Admin action row: flex, logtijd right-aligned ────────────────
+// Admin action row: team | naam | log tekst | [flex] | logtijd(blue pill)
 function AdminRow({ e }) {
   return (
     <li className="bm-admin-row bm-admin-row-admin">
-      <span className="bm-admin-name">{e.adminName}</span>
       <TeamPill team={e.team} />
+      <span className="bm-admin-name" style={{ flexShrink: 0 }}>{e.adminName}</span>
       <span className="bm-admin-time-action">{adminLogAction(e)}</span>
-      <span className="bm-admin-tag bm-admin-tag-admin">
-        {fmt2(e.at)}
-      </span>
+      <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.at)}</span>
     </li>
   );
 }

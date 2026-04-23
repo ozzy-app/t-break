@@ -114,14 +114,25 @@ export function useAuth() {
     };
   }, []);
 
-  const signOut = async () => {
+  const signOut = async (meData) => {
+    // Clear lastSeen so the user disappears from Gebruikers panel immediately
+    if (meData?.userId) {
+      try {
+        const { data } = await sb.from('app_state').select('sessions').eq('id', 1).single();
+        if (data?.sessions?.[meData.userId]) {
+          const sessions = { ...data.sessions };
+          sessions[meData.userId] = { ...sessions[meData.userId], lastSeen: 0 };
+          await sb.from('app_state').update({ sessions }).eq('id', 1);
+        }
+      } catch {}
+    }
     try { await sb.auth.signOut(); } catch {}
     setMe(null);
   };
 
   const toggleLeader = () => setMe((p) => ({ ...p, isLeader: !p.isLeader }));
 
-  return { me, setMe, authChecked, signOut, toggleLeader };
+  return { me, setMe, authChecked, signOut: () => signOut(me), toggleLeader };
 }
 
 function buildMe(user, profile) {

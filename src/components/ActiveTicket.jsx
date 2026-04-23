@@ -15,9 +15,9 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
     <section className="t-active-wrap" style={{ touchAction: 'manipulation' }}>
       <div
         className={`t-ticket t-landscape t-col-${myBreak.type} ${over ? 't-ticket-over' : ''}`}
-        onClick={over ? undefined : onEnd}
-        style={{ cursor: over ? 'default' : 'pointer', pointerEvents: over ? 'none' : 'auto' }}
-        title={over ? '' : 'Klik om pauze te beëindigen'}
+        onClick={(e) => { e.stopPropagation(); onEnd(); }}
+        style={{ cursor: 'pointer' }}
+        title="Klik om pauze te beëindigen"
       >
         <div className="t-body-l">
           <div className="t-brand-l">T-BREAK</div>
