@@ -601,16 +601,16 @@
       }
       .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 
-      /* ── Break log rows: 9-column fixed grid ──────────────────────
-         team | naam | type | flex | status | overtime | starttijd | eindtijd | logtijd
+      /* ── Log rows: 9-column fixed grid ────────────────────────────
+         team | naam | log tekst (1fr) | type | status | overtime | start | end | logtijd
          ─────────────────────────────────────────────────────────── */
       .bm-admin-row {
         display: grid;
         grid-template-columns:
           90px    /* team pill */
-          130px   /* naam — wide enough for long names */
-          52px    /* break type pill */
-          1fr     /* log text / spacer */
+          130px   /* naam */
+          1fr     /* log text / spacer — takes remaining space */
+          52px    /* break type pill (BRB/SHORT/LUNCH) */
           82px    /* status pill (VROEG/LAAT/ADMIN/TIMER) */
           72px    /* overtime +Xm */
           50px    /* starttijd */

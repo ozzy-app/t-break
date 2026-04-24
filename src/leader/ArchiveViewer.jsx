@@ -59,29 +59,24 @@ function fmt2(ts, opts = { hour: '2-digit', minute: '2-digit' }) {
 }
 
 // Column order (9 cols):
-// team | naam | type | spacer | status | overtime | starttijd | eindtijd | logtijd(blue)
+// team | naam | log tekst (1fr) | type | status | overtime | starttijd | eindtijd | logtijd(blue)
 function BreakRow({ e }) {
   const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
   return (
     <li className="bm-admin-row">
       <TeamPill team={e.team} />
       <span className="bm-admin-name">{e.userName}</span>
+      <span />  {/* 1fr spacer */}
       <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label || '–'}</span>
-      <span />
-      {/* status pill */}
       <span>
         {isLate
           ? <span className="bm-admin-late-pill">Laat</span>
           : <span className={`bm-admin-tag bm-admin-tag-${e.endReason || 'timer'}`}>{endReasonText[e.endReason] || e.endReason || '—'}</span>
         }
       </span>
-      {/* overtime */}
       <span className="bm-admin-overtime">{isLate ? fmtOver(overMs) : ''}</span>
-      {/* starttijd first */}
       <span className="bm-admin-time-cell">{fmt2(e.startedAt)}</span>
-      {/* eindtijd second */}
       <span className="bm-admin-time-cell">{e.endedAt ? fmt2(e.endedAt) : '–'}</span>
-      {/* logtijd — blue pill, rightmost */}
       <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.endedAt || e.startedAt)}</span>
     </li>
   );
@@ -94,9 +89,9 @@ function AdminRow({ e }) {
     <li className="bm-admin-row bm-admin-row-admin">
       <TeamPill team={e.team} />
       <span className="bm-admin-name">{e.adminName}</span>
-      <span />  {/* type cell — empty */}
       <span className="bm-admin-time-action">{adminLogAction(e)}</span>
-      <span /><span /><span /><span />  {/* status | overtime | start | end — empty */}
+      {/* type | status | overtime | start | end — all empty, logtijd last */}
+      <span /><span /><span /><span /><span />
       <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.at)}</span>
     </li>
   );
