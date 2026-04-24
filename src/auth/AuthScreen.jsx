@@ -110,7 +110,7 @@ export function AuthScreen({ onAuth }) {
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? doLogin() : doRegister())} />
           <button className="bm-pw-eye" type="button" tabIndex={-1}
-            onClick={() => setShowPw(v => !v)} title={showPw ? 'Verberg wachtwoord' : 'Toon wachtwoord'}>
+            onClick={() => setShowPw(v => !v)} title={showPw ? 'Ik kijk niet!' : 'Toon wachtwoord'}>
             {showPw ? '🙈' : '👁️'}
           </button>
         </div>
