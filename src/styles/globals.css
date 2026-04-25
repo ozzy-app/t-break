@@ -27,8 +27,8 @@
 
       /* ── DARK MODE — dark grey + vibrant accents ── */
       .bm-dark {
-        --bg:            #383838;
-        --bg-2:          #444444;
+        --bg:            #2b2b2b;
+        --bg-2:          #363636;
         --ink:           #fafafa;
         --ink-2:         #a1a1aa;
         --ink-3:         #71717a;
