@@ -151,7 +151,7 @@ export default function App() {
         <div className={`bm-content ${me.isLeader && !isEmployeeView ? 'bm-content-leader' : ''}`}>
           <div className={`bm-rows ${myActive ? 'bm-rows-dim' : ''}`}>
             {me.isLeader && !isEmployeeView ? (
-              getTeamIds(teams).map((team) => (
+              getTeamIds(teams).filter(t => state.teams?.[t]).map((team) => (
                 <TeamSection key={team} team={team} teamData={state.teams[team]} me={me} />
               ))
             ) : myTeam ? (

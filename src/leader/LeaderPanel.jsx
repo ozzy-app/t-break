@@ -1,12 +1,11 @@
 import { useState } from 'react';
-
 import { PendingApprovals } from './PendingApprovals';
 import { TeamControls } from './TeamControls';
 import { UsersTable } from './UsersTable';
 import { AdminActiveRow } from './AdminActiveRow';
 import { CalendarButton, ArchiveViewer, LogToday } from './ArchiveViewer';
 import { TeamEditorModal } from './TeamEditor';
-import { useTeams, getTeamIds } from '../lib/TeamsContext';
+import { useTeams, getTeamIds, getTeamLabel, getTeamColor } from '../lib/TeamsContext';
 
 export function LeaderPanel({
   state, me,
@@ -21,22 +20,29 @@ export function LeaderPanel({
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClearLog, setConfirmClearLog] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(true);
-  const teams = useTeams();
   const [archiveDate, setArchiveDate] = useState(null);
   const [archiveLog, setArchiveLog] = useState(null);
   const [teamsEditOpen, setTeamsEditOpen] = useState(false);
+  const teams = useTeams();
+
+  // Only iterate teams that actually exist in state.teams to avoid crashes
+  // during the brief moment before state syncs from Supabase
+  const activeTeamIds = getTeamIds(teams).filter(t => state.teams?.[t]);
 
   return (
     <section className="bm-leader">
       <div className="bm-leader-header">
         <span className="bm-leader-eyebrow">Admin Panel</span>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <button
+            className="bm-cal-btn"
+            onClick={() => setTeamsEditOpen(true)}
+            title="Teams beheren"
+          >
+            ✏️
+          </button>
           {onOpenUserMgmt && (
-            <button
-              className="bm-cal-btn"
-              onClick={onOpenUserMgmt}
-              title="Gebruikersbeheer"
-            >
+            <button className="bm-cal-btn" onClick={onOpenUserMgmt} title="Gebruikersbeheer">
               👤
             </button>
           )}
@@ -71,34 +77,30 @@ export function LeaderPanel({
           visible={controlsOpen}
         />
 
-        {/* On break now — all teams */}
+        {/* Nu op pauze */}
         <div className="bm-leader-section">
           <h3 className="bm-leader-h3">Nu op pauze</h3>
-          {getTeamIds(teams).every((t) => state.teams[t].activeBreaks.length === 0) ? (
+          {activeTeamIds.every((t) => state.teams[t].activeBreaks.length === 0) ? (
             <div className="bm-empty">Niemand op pauze.</div>
           ) : (
-            getTeamIds(teams).map(
-              (team) =>
-                state.teams[team].activeBreaks.length > 0 && (
-                  <div key={team} className="bm-team-break-group">
-                    <div
-                      className="bm-team-break-label"
-                      style={{ color: TEAM_COLORS[team] }}
-                    >
-                      {TEAM_LABELS[team]}
-                    </div>
-                    <ul className="bm-admin-list">
-                      {state.teams[team].activeBreaks.map((b) => (
-                        <AdminActiveRow
-                          key={b.id}
-                          b={b}
-                          config={state.teams[team].config}
-                          onEnd={() => onEndBreak(b.id, team)}
-                        />
-                      ))}
-                    </ul>
+            activeTeamIds.map((team) =>
+              state.teams[team].activeBreaks.length > 0 && (
+                <div key={team} className="bm-team-break-group">
+                  <div className="bm-team-break-label" style={{ color: getTeamColor(teams, team) }}>
+                    {getTeamLabel(teams, team)}
                   </div>
-                )
+                  <ul className="bm-admin-list">
+                    {state.teams[team].activeBreaks.map((b) => (
+                      <AdminActiveRow
+                        key={b.id}
+                        b={b}
+                        config={state.teams[team].config}
+                        onEnd={() => onEndBreak(b.id, team)}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              )
             )
           )}
         </div>
@@ -127,10 +129,8 @@ export function LeaderPanel({
           {confirmReset ? (
             <div className="bm-reset-confirm">
               <span>Verwijdert alle gegevens voor iedereen. Zeker?</span>
-              <button
-                className="bm-btn bm-btn-danger"
-                onClick={() => { onReset(); setConfirmReset(false); }}
-              >
+              <button className="bm-btn bm-btn-danger"
+                onClick={() => { onReset(); setConfirmReset(false); }}>
                 Ja, resetten
               </button>
               <button className="bm-btn bm-btn-ghost" onClick={() => setConfirmReset(false)}>
@@ -140,10 +140,8 @@ export function LeaderPanel({
           ) : confirmClearLog ? (
             <div className="bm-reset-confirm">
               <span>Logboek van vandaag wissen? Archief blijft behouden.</span>
-              <button
-                className="bm-btn bm-btn-danger"
-                onClick={() => { onClearLog(); setConfirmClearLog(false); }}
-              >
+              <button className="bm-btn bm-btn-danger"
+                onClick={() => { onClearLog(); setConfirmClearLog(false); }}>
                 Ja, wissen
               </button>
               <button className="bm-btn bm-btn-ghost" onClick={() => setConfirmClearLog(false)}>
@@ -162,6 +160,10 @@ export function LeaderPanel({
           )}
         </div>
       </div>
+
+      {teamsEditOpen && (
+        <TeamEditorModal state={state} onClose={() => setTeamsEditOpen(false)} notify={notify} />
+      )}
     </section>
   );
 }
