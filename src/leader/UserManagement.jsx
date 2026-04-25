@@ -197,15 +197,16 @@ function ExportModal({ userId, userName, onClose, notify }) {
 }
 
 // ── Main UserManagement view ─────────────────────────────────────
-// ── Activity log — uses same 9-column grid as main log ──────────
+// ── Activity log — same grid as main log ────────────────────────
 function ActivityLog({ logs }) {
   const [open, setOpen] = useState(false);
 
-  const fmt = (ts) => ts ? new Date(ts).toLocaleString('nl-NL', {
-    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-  }) : '–';
   const fmtTime = (ts) => ts
     ? new Date(ts).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
+    : '–';
+  const fmtFull = (ts) => ts
+    ? new Date(ts).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
+      new Date(ts).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
     : '–';
   const fmtOver = (ms) => {
     const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000);
@@ -228,7 +229,6 @@ function ActivityLog({ logs }) {
           : <ul className="bm-admin-list">
               {logs.map(e => {
                 if (e.kind === 'admin') {
-                  // admin row: [empty team] | naam | log tekst | [6 empty] | logtijd
                   return (
                     <li key={e.id} className="bm-admin-row bm-admin-row-admin">
                       <span />
@@ -241,18 +241,20 @@ function ActivityLog({ logs }) {
                     </li>
                   );
                 }
-                // break row: 10-col: [empty team] | naam | [spacer] | type | [empty status] | end-type | overtime | start | end | logtijd
                 const EXPECTED = { brb: 180000, short: 900000, lunch: 1800000 };
                 const exp = EXPECTED[e.break_type] || 0;
                 const dur = e.duration_ms || 0;
                 const overMs = exp > 0 && dur > exp ? dur - exp : 0;
                 const isLate = overMs > 0;
-                const endReason = (e.end_reason || 'timer');
+                const endReason = e.end_reason || 'timer';
                 return (
                   <li key={e.id} className="bm-admin-row">
                     <span />
                     <span className="bm-admin-name">{e.user_name}</span>
-                    <span />
+                    {/* Use the 1fr log-text column for the date so times fit cleanly */}
+                    <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>
+                      {e.started_at ? new Date(e.started_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : ''}
+                    </span>
                     <span className={`bm-admin-type bm-admin-type-${e.break_type}`}>
                       {TYPES[e.break_type]?.label || '–'}
                     </span>
@@ -266,7 +268,7 @@ function ActivityLog({ logs }) {
                       }
                     </span>
                     <span className="bm-admin-overtime">{isLate ? fmtOver(overMs) : ''}</span>
-                    <span className="bm-admin-time-cell">{fmt(e.started_at)}</span>
+                    <span className="bm-admin-time-cell">{fmtTime(e.started_at)}</span>
                     <span className="bm-admin-time-cell">{fmtTime(e.ended_at)}</span>
                     <span className="bm-admin-tag bm-admin-tag-admin">
                       {fmtTime(e.ended_at || e.started_at)}
