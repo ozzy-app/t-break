@@ -189,7 +189,13 @@ export function CalendarButton({ onOpenArchive, notify }) {
   return (
     <div className="bm-cal-wrap">
       <button className={`bm-cal-btn ${open ? 'bm-cal-btn-active' : ''}`}
-        onClick={() => setOpen(v => !v)} title="Logboek per dag">📅
+        onClick={() => setOpen(v => !v)} title="Logboek per dag">
+        <svg className="bm-cal-btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+          <rect x="2" y="3" width="12" height="12" rx="2"/>
+          <path d="M5 1v4M11 1v4M2 7h12"/>
+          <text x="8" y="13.5" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="currentColor" stroke="none" fontFamily="Geist,sans-serif">17</text>
+        </svg>
+        Logboek
       </button>
       {open && createPortal(
         <div className="bm-modal-backdrop" onClick={() => setOpen(false)}>

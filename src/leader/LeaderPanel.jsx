@@ -34,28 +34,41 @@ export function LeaderPanel({
       <div className="bm-leader-header">
         <span className="bm-leader-eyebrow">Admin Panel</span>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          <button
-            className="bm-cal-btn"
-            onClick={() => setTeamsEditOpen(true)}
-            title="Teams beheren"
-          >
-            ✏️
+          {/* Edit Teams */}
+          <button className="bm-cal-btn" onClick={() => setTeamsEditOpen(true)} title="Teams beheren">
+            <svg className="bm-cal-btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="15" height="15">
+              <path d="M11 2l3 3-8 8H3v-3l8-8z"/>
+            </svg>
+            Teams
           </button>
+          {/* Gebruikersbeheer */}
           {onOpenUserMgmt && (
             <button className="bm-cal-btn" onClick={onOpenUserMgmt} title="Gebruikersbeheer">
-              👤
+              <svg className="bm-cal-btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="15" height="15">
+                <circle cx="8" cy="5" r="3"/>
+                <path d="M2 14c0-3 2.5-5 6-5s6 2 6 5"/>
+              </svg>
+              Gebruikers
             </button>
           )}
+          {/* Kalender */}
           <CalendarButton
             onOpenArchive={(d, log) => { setArchiveDate(d); setArchiveLog(log); }}
             notify={notify}
           />
+          {/* Ticket controls toggle */}
           <button
-            className={`bm-cal-btn ${controlsOpen ? '' : 'bm-cal-btn-active'}`}
+            className={`bm-cal-btn ${controlsOpen ? 'bm-cal-btn-active' : ''}`}
             onClick={() => setControlsOpen((v) => !v)}
             title={controlsOpen ? 'Verberg ticketcontroles' : 'Toon ticketcontroles'}
           >
-            {controlsOpen ? '▲' : '▼'}
+            <svg className="bm-cal-btn-icon" viewBox="0 0 16 16" fill="currentColor" width="12" height="12">
+              {controlsOpen
+                ? <path d="M8 4l6 8H2z"/>
+                : <path d="M8 12L2 4h12z"/>
+              }
+            </svg>
+            Tickets
           </button>
         </div>
       </div>

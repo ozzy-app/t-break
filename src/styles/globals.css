@@ -126,14 +126,15 @@
       .bm-header-sq-btn:hover { border-color: var(--brand); color: var(--brand); }
       .bm-header-actions { display: flex; align-items: center; gap: 10px; }
       .bm-dark-toggle {
-        width: 36px; height: 36px; border-radius: 50%;
-        border: 1px solid var(--border-strong);
+        width: 40px; height: 40px; border-radius: 50%;
+        border: 1.5px solid var(--border-strong);
         background: var(--bg-2); color: var(--ink);
-        font-size: 15px; cursor: pointer; line-height: 1;
+        font-size: 17px; cursor: pointer; line-height: 1;
         display: flex; align-items: center; justify-content: center;
-        transition: background 0.2s, border-color 0.2s, transform 0.2s;
+        transition: background 0.2s, border-color 0.2s, transform 0.25s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
       }
-      .bm-dark-toggle:hover { border-color: var(--brand); transform: rotate(20deg); }
+      .bm-dark-toggle:hover { border-color: var(--ink-2); transform: rotate(22deg); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
       .bm-brand { display: flex; align-items: center; gap: 10px; }
       .bm-brand-mark { font-size: 20px; color: var(--brand); }
       .bm-brand-name {
@@ -142,12 +143,14 @@
       }
       .bm-header-right { position: relative; }
       .bm-chip {
-        display: inline-flex; align-items: center; gap: 10px;
-        padding: 8px 14px; border-radius: 999px;
-        background: var(--bg-2); border: 1px solid var(--border);
-        font: 500 13px 'Geist'; color: var(--ink); cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 18px; border-radius: 999px;
+        background: var(--bg-2); border: 1.5px solid var(--border-strong);
+        font: 500 14px 'Geist'; color: var(--ink); cursor: pointer;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
-      .bm-chip:hover { border-color: var(--border-strong); }
+      .bm-chip:hover { border-color: var(--ink-2); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
       .bm-chip-crown {
         font-size: 14px; color: var(--brand);
         filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
@@ -795,16 +798,19 @@
         display: flex; align-items: center; justify-content: space-between;
       }
       .bm-cal-wrap { position: relative; }
+      /* Admin header action buttons — rounded pill with icon + label */
       .bm-cal-btn {
-        width: 34px; height: 34px; border-radius: 8px;
-        border: 1px solid var(--border); background: var(--bg);
-        font-size: 16px; cursor: pointer; line-height: 1;
-        display: flex; align-items: center; justify-content: center;
-        transition: background 0.15s, border-color 0.15s;
+        height: 36px; padding: 0 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border); background: var(--bg-2);
+        font: 500 12px 'Geist'; color: var(--ink); cursor: pointer;
+        display: flex; align-items: center; gap: 6px;
+        transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+        white-space: nowrap;
       }
-      .bm-cal-btn:hover, .bm-cal-btn-active {
-        background: var(--bg-2); border-color: var(--border-strong);
-      }
+      .bm-cal-btn:hover { background: var(--bg); border-color: var(--border-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+      .bm-cal-btn-active { background: var(--bg); border-color: var(--border-strong); }
+      .bm-cal-btn-icon { font-size: 15px; line-height: 1; flex-shrink: 0; }
       .bm-cal-dropdown {
         /* kept for legacy — modal replaces it */
         display: none;
