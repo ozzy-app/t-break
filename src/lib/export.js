@@ -20,7 +20,7 @@ function buildRows(data, teams = []) {
       const expMs = (EXPECTED_SEC[r.break_type] || 0) * 1000;
       const overMs = expMs > 0 && durMs > expMs ? durMs - expMs : 0;
       const isLate = overMs > 0;
-      const teamId = r.action_data?.team || r.team || '';
+      const teamId = r.team || r.action_data?.team || '';
       const endReasonMap = { early: 'VROEG', timer: 'TIMER', forfeit: 'VERLOPEN', 'leader-ended': 'ADMIN' };
       const eindstatus = isLate ? 'LAAT' : (endReasonMap[r.end_reason] || r.end_reason || '');
       const fmtDt = (ts) => ts ? new Date(ts).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';

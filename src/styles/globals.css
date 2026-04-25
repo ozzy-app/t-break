@@ -623,16 +623,16 @@
       .bm-admin-row {
         display: grid;
         grid-template-columns:
-          minmax(70px, auto)    /* team pill — flexible */
-          minmax(90px, auto)    /* naam — flexible */
-          1fr                   /* log tekst / live counter — takes remaining space */
-          minmax(60px, auto)    /* pauze counter / break type pill */
-          minmax(64px, auto)    /* status (actief/op pauze) */
-          minmax(72px, auto)    /* end type (VROEG/LAAT/ADMIN/TIMER) */
-          minmax(58px, auto)    /* overtime +Xm */
-          48px                  /* starttijd */
-          48px                  /* eindtijd */
-          52px                  /* logtijd blue pill */
+          max-content    /* team pill — sized to widest pill */
+          max-content    /* naam — sized to widest name */
+          1fr            /* log tekst — takes remaining space */
+          max-content    /* pauze type pill */
+          max-content    /* status */
+          max-content    /* end type (VROEG/LAAT/ADMIN/TIMER) */
+          max-content    /* overtime +Xm */
+          48px           /* starttijd */
+          48px           /* eindtijd */
+          52px           /* logtijd blue pill */
         ;
         align-items: center; gap: 8px;
         padding: 8px 14px; background: var(--bg); border-radius: 8px;
@@ -651,8 +651,9 @@
       .bm-admin-row-active .bm-admin-time { flex: 1; }
       /* Log admin rows stay on the grid — no flex override */
       .bm-admin-row-admin .bm-admin-time-action { /* sits in the 1fr cell naturally */ }
-      .bm-admin-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-      .bm-admin-team { display: flex; align-items: center; } /* team pill cell */
+      .bm-admin-name { font-weight: 500; white-space: nowrap; min-width: 0; text-align: left; }
+      .bm-admin-team { display: flex; align-items: center; text-align: left; }
+      .bm-admin-time-cell { font-family: 'Geist Mono'; font-size: 11px; color: var(--ink-2); white-space: nowrap; text-align: left; }
       .bm-admin-type {
         font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
         font-weight: 700; padding: 2px 9px; border-radius: 99px;

@@ -128,6 +128,7 @@ export async function insertLog(entry) {
             ...base,
             user_id: entry.userId,
             user_name: entry.userName,
+            team: entry.team || null,
             break_type: entry.type,
             started_at: new Date(entry.startedAt).toISOString(),
             ended_at: entry.endedAt ? new Date(entry.endedAt).toISOString() : null,
