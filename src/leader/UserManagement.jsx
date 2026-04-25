@@ -251,9 +251,15 @@ function ActivityLog({ logs }) {
                   <li key={e.id} className="bm-admin-row">
                     <span />
                     <span className="bm-admin-name">{e.user_name}</span>
-                    {/* Use the 1fr log-text column for the date so times fit cleanly */}
-                    <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>
-                      {e.started_at ? new Date(e.started_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : ''}
+                    <span className="bm-admin-log-text">
+                      {({
+                        brb: 'heeft even BRB genomen',
+                        short: 'heeft korte pauze genomen',
+                        lunch: 'heeft gelunched',
+                      })[e.break_type] || ''}
+                      <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>
+                        {e.started_at ? new Date(e.started_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : ''}
+                      </span>
                     </span>
                     <span className={`bm-admin-type bm-admin-type-${e.break_type}`}>
                       {TYPES[e.break_type]?.label || '–'}
