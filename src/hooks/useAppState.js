@@ -31,15 +31,19 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
       if (!mounted) return;
       const raw = incoming || (await loadShared());
 
+      // Ensure all dynamic teams have entries in state
+      const teamIds = dynamicTeams?.map(t => t.id) || [];
+      const rawWithTeams = ensureTeamsInState(raw, teamIds);
+
       // Check if user had an active offer before cleanup
-      const myTeamRaw = me.team ? raw.teams[me.team] : null;
+      const myTeamRaw = me.team ? rawWithTeams.teams[me.team] : null;
       const hadOffer = myTeamRaw
         ? Object.keys(TYPES).some(type =>
             myTeamRaw.queues[type]?.some(q => q.userId === me.userId && q.offeredAt)
           )
         : false;
 
-      const cleaned = cleanup(raw);
+      const cleaned = cleanup(rawWithTeams);
 
       // If user had an offer but it's gone after cleanup → notify them it expired
       const myTeamCleaned = me.team ? cleaned.teams[me.team] : null;
@@ -56,7 +60,7 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
         }
       }
 
-      if (!eq(cleaned, raw)) {
+      if (!eq(cleaned, rawWithTeams)) {
         try {
           await saveShared(cleaned);
         } catch (e) {

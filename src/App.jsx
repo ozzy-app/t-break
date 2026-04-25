@@ -174,7 +174,7 @@ export default function App() {
                 >
                   {getTeamLabel(teams, myTeam)}
                 </div>
-                {Object.keys(TYPES).map((type) => (
+                {myTeamData ? Object.keys(TYPES).map((type) => (
                   <TicketRow
                     key={type}
                     type={type}
@@ -192,7 +192,7 @@ export default function App() {
                       myOffer && myOffer.type === type ? claimOffer(type) : undefined
                     }
                   />
-                ))}
+                )) : <div className="bm-loading" style={{ padding: '20px 0' }}>Laden…</div>}
               </>
             ) : null}
           </div>
