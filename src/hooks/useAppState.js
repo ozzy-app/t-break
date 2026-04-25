@@ -6,12 +6,19 @@ import {
   loadShared,
   saveShared,
   insertLog,
+  ensureTeamsInState,
 } from '../lib/state';
 import { TYPES, TEAM_LABELS } from '../lib/constants';
 import { todayStr, uid, eq } from '../lib/helpers';
 
-export function useAppState(me, setMe, notify) {
+export function useAppState(me, setMe, notify, dynamicTeams) {
   const [state, setState] = useState(blankState());
+
+  // When dynamic teams load/change, ensure state.teams has entries for all of them
+  useEffect(() => {
+    if (!dynamicTeams?.length) return;
+    setState(prev => ensureTeamsInState(prev, dynamicTeams.map(t => t.id)));
+  }, [dynamicTeams]);
   const [, setTick] = useState(0);
   const actionQueue = useRef(Promise.resolve());
 

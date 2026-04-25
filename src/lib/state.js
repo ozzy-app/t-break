@@ -194,6 +194,21 @@ export async function registerSession(meData) {
   }
 }
 
+// Ensure all dynamic team IDs have an entry in state.teams
+// Call this whenever the teams list from Supabase updates
+export function ensureTeamsInState(state, teamIds) {
+  if (!teamIds?.length) return state;
+  let changed = false;
+  const s = state;
+  for (const id of teamIds) {
+    if (!s.teams[id]) {
+      s.teams[id] = blankTeam();
+      changed = true;
+    }
+  }
+  return changed ? { ...s, teams: { ...s.teams } } : s;
+}
+
 // ---------- cleanup: per-team expiry + offer distribution ----------
 export function cleanup(state) {
   const s = JSON.parse(JSON.stringify(state));

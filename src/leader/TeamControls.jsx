@@ -8,6 +8,7 @@ export function TeamControls({ state, onUpdateConfig, onSetDefault, onLoadDefaul
     <>
       {getTeamIds(teams).map((team) => {
         const td = state.teams[team];
+        if (!td) return null; // team exists in Supabase but not in state yet — skip until next sync
         const def = state.defaultConfigs?.[team];
         const hasDefault = !!def;
         return (
