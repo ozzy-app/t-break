@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { sb } from '../lib/supabase';
 import { registerSession } from '../lib/state';
+import { APP_VERSION } from '../lib/version';
 
 export function AuthScreen({ onAuth }) {
   const [mode, setMode] = useState('login');
@@ -92,38 +93,39 @@ export function AuthScreen({ onAuth }) {
 
   return (
     <div className="bm-root bm-center">
-      <div className="bm-entry">
-        <div className="bm-entry-eyebrow">T-BREAK</div>
-        <h1 className="bm-entry-title">{mode === 'login' ? 'Inloggen' : 'Account aanmaken'}</h1>
-        <p className="bm-entry-sub">{mode === 'login' ? 'Log in met je werkaccount.' : 'Maak een account aan met je werkmail.'}</p>
-        {error && <div className="bm-auth-error">{error}</div>}
-        {mode === 'register' && (
-          <input className="bm-input" placeholder="Jouw naam" value={name}
-            onChange={e => setName(e.target.value)} style={{ marginBottom: '12px' }} />
-        )}
-        <input className="bm-input" placeholder="Werkemail" type="email" value={email}
-          onChange={e => setEmail(e.target.value)} style={{ marginBottom: '12px' }} />
-        {/* Password field with show/hide eye */}
-        <div className="bm-pw-wrap" style={{ marginBottom: '20px' }}>
-          <input className="bm-input" placeholder="Wachtwoord"
-            type={showPw ? 'text' : 'password'} value={password}
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? doLogin() : doRegister())} />
-          <button className="bm-pw-eye" type="button" tabIndex={-1}
-            onClick={() => setShowPw(v => !v)} title={showPw ? 'Ik kijk niet!' : 'Toon wachtwoord'}>
-            {showPw ? '🙈' : '👁️'}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+        <div className="bm-entry">
+          <div className="bm-entry-eyebrow">T-BREAK</div>
+          <h1 className="bm-entry-title">{mode === 'login' ? 'Inloggen' : 'Account aanmaken'}</h1>
+          <p className="bm-entry-sub">{mode === 'login' ? 'Log in met je werkaccount.' : 'Maak een account aan met je werkmail.'}</p>
+          {error && <div className="bm-auth-error">{error}</div>}
+          {mode === 'register' && (
+            <input className="bm-input" placeholder="Jouw naam" value={name}
+              onChange={e => setName(e.target.value)} style={{ marginBottom: '12px' }} />
+          )}
+          <input className="bm-input" placeholder="Werkemail" type="email" value={email}
+            onChange={e => setEmail(e.target.value)} style={{ marginBottom: '12px' }} />
+          <div className="bm-pw-wrap" style={{ marginBottom: '20px' }}>
+            <input className="bm-input" placeholder="Wachtwoord"
+              type={showPw ? 'text' : 'password'} value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (mode === 'login' ? doLogin() : doRegister())} />
+            <button className="bm-pw-eye" type="button" tabIndex={-1}
+              onClick={() => setShowPw(v => !v)} title={showPw ? 'Ik kijk niet!' : 'Toon wachtwoord'}>
+              {showPw ? '🙈' : '👁️'}
+            </button>
+          </div>
+          <button className="bm-btn bm-btn-primary bm-btn-lg"
+            onClick={mode === 'login' ? doLogin : doRegister} disabled={loading}>
+            {loading ? 'Bezig…' : mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
+          </button>
+          <button className="bm-auth-switch" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}>
+            {mode === 'login' ? 'Nog geen account? Registreren' : 'Al een account? Inloggen'}
           </button>
         </div>
-        <button className="bm-btn bm-btn-primary bm-btn-lg"
-          onClick={mode === 'login' ? doLogin : doRegister} disabled={loading}>
-          {loading ? 'Bezig…' : mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
-        </button>
-        <button className="bm-auth-switch" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}>
-          {mode === 'login' ? 'Nog geen account? Registreren' : 'Al een account? Inloggen'}
-        </button>
-      </div>
-      <div style={{ marginTop: 16, fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist', fontWeight: 500 }}>
-        v0.5.023
+        <div style={{ marginTop: 14, fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist', fontWeight: 500 }}>
+          {APP_VERSION}
+        </div>
       </div>
     </div>
   );
