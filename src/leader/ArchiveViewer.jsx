@@ -78,7 +78,11 @@ function BreakRow({ e }) {
     <li className="bm-admin-row">
       <TeamPill team={e.team} />
       <span className="bm-admin-name">{e.userName}</span>
-      <span />  {/* log tekst */}
+      <span className="bm-admin-log-text">{{
+        brb: 'is even BRB gegaan...',
+        short: 'heeft korte pauze genomen',
+        lunch: 'heeft lunchpauze genomen',
+      }[e.type] || ''}</span>
       <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label || '–'}</span>
       <span />  {/* status — empty for completed */}
       <span>

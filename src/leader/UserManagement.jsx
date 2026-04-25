@@ -253,9 +253,9 @@ function ActivityLog({ logs }) {
                     <span className="bm-admin-name">{e.user_name}</span>
                     <span className="bm-admin-log-text">
                       {({
-                        brb: 'heeft even BRB genomen',
+                        brb: 'is even BRB gegaan...',
                         short: 'heeft korte pauze genomen',
-                        lunch: 'heeft gelunched',
+                        lunch: 'heeft lunchpauze genomen',
                       })[e.break_type] || ''}
                       <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>
                         {e.started_at ? new Date(e.started_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : ''}
