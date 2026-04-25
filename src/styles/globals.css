@@ -1051,10 +1051,24 @@
         position: relative;
       }
       .bm-footer b { color: var(--ink); font-weight: 500; }
-      .bm-version {
+      /* Version pill — clickable Easter egg trigger */
+      .bm-version-pill {
         position: absolute; right: 0; bottom: 0;
-        font-size: 11px; color: var(--ink-3);
-        font-family: 'Geist'; font-weight: 500; letter-spacing: 0.02em;
+        background: rgba(120,120,120,0.18); color: var(--ink-2);
+        border: none; border-radius: 99px;
+        padding: 3px 10px; font-size: 11px; font-weight: 500;
+        font-family: 'Geist'; letter-spacing: 0.03em;
+        cursor: pointer; transition: background 0.15s;
+        white-space: nowrap;
+      }
+      .bm-version-pill:hover { background: rgba(120,120,120,0.30); }
+
+      /* Easter egg float animation */
+      @keyframes bm-easter-float {
+        0%   { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+        15%  { opacity: 1; transform: translateY(-60px) translateX(calc(var(--sway) * 0.3)) scale(1); }
+        85%  { opacity: 1; }
+        100% { transform: translateY(-420px) translateX(var(--sway)) scale(0.8); opacity: 0; }
       }
 
       .bm-toast {
