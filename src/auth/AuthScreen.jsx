@@ -122,6 +122,9 @@ export function AuthScreen({ onAuth }) {
           {mode === 'login' ? 'Nog geen account? Registreren' : 'Al een account? Inloggen'}
         </button>
       </div>
+      <div style={{ marginTop: 16, fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist', fontWeight: 500 }}>
+        v0.5.021
+      </div>
     </div>
   );
 }
