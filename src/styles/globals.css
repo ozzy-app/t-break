@@ -599,6 +599,15 @@
         padding: 14px; background: var(--bg); border-radius: 8px;
         font-size: 13px; color: var(--ink-3); text-align: center;
       }
+
+      /* Nu op pauze — thin outline to catch the eye */
+      .bm-nop-section {
+        border: 1.5px solid var(--border-strong);
+        border-radius: 12px;
+        padding: 14px !important;
+      }
+      .bm-dark .bm-nop-section { border-color: rgba(255,255,255,0.12); }
+
       .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 
       /* ── Log rows: 9-column fixed grid ────────────────────────────
@@ -607,15 +616,16 @@
       .bm-admin-row {
         display: grid;
         grid-template-columns:
-          90px    /* team pill */
-          130px   /* naam */
-          1fr     /* log text / spacer — takes remaining space */
-          52px    /* break type pill (BRB/SHORT/LUNCH) */
-          82px    /* status pill (VROEG/LAAT/ADMIN/TIMER) */
-          72px    /* overtime +Xm */
-          50px    /* starttijd */
-          50px    /* eindtijd */
-          54px    /* logtijd blue pill */
+          minmax(70px, auto)    /* team pill — flexible */
+          minmax(90px, auto)    /* naam — flexible */
+          1fr                   /* log tekst / live counter — takes remaining space */
+          minmax(60px, auto)    /* pauze counter / break type pill */
+          minmax(64px, auto)    /* status (actief/op pauze) */
+          minmax(72px, auto)    /* end type (VROEG/LAAT/ADMIN/TIMER) */
+          minmax(58px, auto)    /* overtime +Xm */
+          48px                  /* starttijd */
+          48px                  /* eindtijd */
+          52px                  /* logtijd blue pill */
         ;
         align-items: center; gap: 8px;
         padding: 8px 14px; background: var(--bg); border-radius: 8px;

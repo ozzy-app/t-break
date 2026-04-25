@@ -1,6 +1,14 @@
 import { sb } from './supabase';
 
+// Canonical column order — matches the screen layout exactly
+// team | naam | log tekst | type | status | eindstatus | overtime | start | einde | logtijd
+
 const EXPECTED_SEC = { brb: 180, short: 900, lunch: 1800 };
+
+export const CSV_HEADERS = [
+  'Team', 'Naam', 'Datum', 'Type',
+  'Status', 'Eindstatus', 'Overtijd', 'Start', 'Einde', 'Logtijd'
+];
 
 function buildRows(data, teams = []) {
   const getLabel = (id) => teams.find(t => t.id === id)?.label || id || '';
@@ -12,25 +20,28 @@ function buildRows(data, teams = []) {
       const expMs = (EXPECTED_SEC[r.break_type] || 0) * 1000;
       const overMs = expMs > 0 && durMs > expMs ? durMs - expMs : 0;
       const isLate = overMs > 0;
+      const teamId = r.action_data?.team || r.team || '';
+      const endReasonMap = { early: 'VROEG', timer: 'TIMER', forfeit: 'VERLOPEN', 'leader-ended': 'ADMIN' };
+      const eindstatus = isLate ? 'LAAT' : (endReasonMap[r.end_reason] || r.end_reason || '');
+      const fmtDt = (ts) => ts ? new Date(ts).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      const logtime = r.ended_at || r.started_at;
       return [
-        r.log_date                                                  || '',
-        r.user_name                                                 || '',
-        getLabel(r.action_data?.team || ''),
-        r.break_type                                                || '',
-        r.started_at ? new Date(r.started_at).toLocaleString('nl-NL') : '',
-        r.ended_at   ? new Date(r.ended_at).toLocaleString('nl-NL')   : '',
-        durMs        ? (durMs / 60000).toFixed(1)                      : '',
-        r.end_reason                                                || '',
-        r.break_type ? (isLate ? 'JA' : 'NEE')                     : '',
-        isLate       ? `+${(overMs / 60000).toFixed(1)} min`       : '',
+        getLabel(teamId),
+        r.user_name || '',
+        r.log_date || '',
+        r.break_type || '',
+        '',   // status (live — not in completed logs)
+        eindstatus,
+        isLate ? `+${(overMs / 60000).toFixed(1)} min` : '',
+        fmtDt(r.started_at),
+        fmtDt(r.ended_at),
+        fmtDt(logtime),
       ];
     });
 }
 
-const HEADERS = ['Datum', 'Naam', 'Team', 'Type', 'Start', 'Einde', 'Duur (min)', 'Status', 'Laat?', 'Tijd+'];
-
 function toCsv(rows) {
-  const all = [HEADERS, ...rows];
+  const all = [CSV_HEADERS, ...rows];
   return '\uFEFF' + all.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
 }
 
@@ -42,54 +53,49 @@ function download(csv, filename) {
   a.click();
 }
 
-// Export logs for a single user (from UserManagement or admin dots menu)
+async function fetchLogs(filters, notify) {
+  let q = sb.from('logs').select('*');
+  if (filters.userId) q = q.eq('user_id', filters.userId);
+  if (filters.userName && !filters.userId) q = q.eq('user_name', filters.userName);
+  if (filters.from) q = q.gte('log_date', filters.from);
+  if (filters.to) q = q.lte('log_date', filters.to);
+  q = q.order('log_date').order('started_at');
+  let { data } = await q;
+  // Fallback to name query if no results by ID
+  if (!data?.length && filters.userId && filters.userName) {
+    let q2 = sb.from('logs').select('*').eq('user_name', filters.userName);
+    if (filters.from) q2 = q2.gte('log_date', filters.from);
+    if (filters.to) q2 = q2.lte('log_date', filters.to);
+    q2 = q2.order('log_date').order('started_at');
+    const { data: d2 } = await q2;
+    data = d2;
+  }
+  if (!data?.length) { notify?.('Geen logs gevonden', 'warn'); return null; }
+  return data;
+}
+
+// ── Public export functions — all produce identical CSV format ────
+
 export async function exportUserLogs(userId, userName, teams = [], notify) {
-  const today = new Date().toISOString().slice(0, 10);
-  let { data } = await sb.from('logs').select('*').eq('user_id', userId)
-    .order('started_at', { ascending: true });
-  // Fallback to name query for pre-fix logs
-  if (!data?.length) {
-    const byName = await sb.from('logs').select('*').eq('user_name', userName)
-      .order('started_at', { ascending: true });
-    data = byName.data;
-  }
-  if (!data?.length) { notify?.('Geen logs gevonden', 'warn'); return; }
-  const rows = buildRows(data, teams);
-  if (!rows.length) { notify?.('Geen pauze-logs gevonden', 'warn'); return; }
-  download(toCsv(rows), `tbreak-${userName.replace(/\s+/g, '-')}-alle-logs.csv`);
+  const data = await fetchLogs({ userId, userName }, notify);
+  if (!data) return;
+  download(toCsv(buildRows(data, teams)), `tbreak-${userName.replace(/\s+/g, '-')}-alle-logs.csv`);
 }
 
-// Export logs for a single user with date range
 export async function exportUserLogsRange(userId, userName, from, to, teams = [], notify) {
-  let { data } = await sb.from('logs').select('*').eq('user_id', userId)
-    .gte('log_date', from).lte('log_date', to)
-    .order('started_at', { ascending: true });
-  if (!data?.length) {
-    const byName = await sb.from('logs').select('*').eq('user_name', userName)
-      .gte('log_date', from).lte('log_date', to)
-      .order('started_at', { ascending: true });
-    data = byName.data;
-  }
-  if (!data?.length) { notify?.('Geen logs gevonden voor deze periode', 'warn'); return; }
-  const rows = buildRows(data, teams);
-  download(toCsv(rows), `tbreak-${userName.replace(/\s+/g, '-')}-${from}--${to}.csv`);
+  const data = await fetchLogs({ userId, userName, from, to }, notify);
+  if (!data) return;
+  download(toCsv(buildRows(data, teams)), `tbreak-${userName.replace(/\s+/g, '-')}-${from}--${to}.csv`);
 }
 
-// Export all logs for a single day (calendar)
 export async function exportDayLogs(date, teams = [], notify) {
-  const { data, error } = await sb.from('logs').select('*')
-    .eq('log_date', date).order('started_at', { ascending: true });
-  if (error || !data?.length) { notify?.('Geen logs gevonden', 'warn'); return; }
-  const rows = buildRows(data, teams);
-  download(toCsv(rows), `tbreak-log-${date}.csv`);
+  const data = await fetchLogs({ from: date, to: date }, notify);
+  if (!data) return;
+  download(toCsv(buildRows(data, teams)), `tbreak-log-${date}.csv`);
 }
 
-// Export all logs for a date range (calendar range export)
 export async function exportRangeLogs(from, to, teams = [], notify) {
-  const { data, error } = await sb.from('logs').select('*')
-    .gte('log_date', from).lte('log_date', to)
-    .order('log_date').order('started_at');
-  if (error || !data?.length) { notify?.('Geen logs gevonden voor deze periode', 'warn'); return; }
-  const rows = buildRows(data, teams);
-  download(toCsv(rows), `tbreak-${from}--${to}.csv`);
+  const data = await fetchLogs({ from, to }, notify);
+  if (!data) return;
+  download(toCsv(buildRows(data, teams)), `tbreak-${from}--${to}.csv`);
 }

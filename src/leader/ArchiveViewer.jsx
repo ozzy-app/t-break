@@ -70,7 +70,7 @@ function TeamPill({ team }) {
 }
 
 // ── Log row components ───────────────────────────────────────────
-// 9-col grid: team | naam | log tekst (1fr) | type | status | overtime | start | end | logtijd
+// 10-col: team | naam | log tekst | type | status | end-type | overtime | start | end | logtijd
 
 function BreakRow({ e }) {
   const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
@@ -78,8 +78,9 @@ function BreakRow({ e }) {
     <li className="bm-admin-row">
       <TeamPill team={e.team} />
       <span className="bm-admin-name">{e.userName}</span>
-      <span />
+      <span />  {/* log tekst */}
       <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label || '–'}</span>
+      <span />  {/* status — empty for completed */}
       <span>
         {isLate
           ? <span className="bm-admin-late-pill">Laat</span>
@@ -103,7 +104,8 @@ function AdminRow({ e }) {
       <TeamPill team={e.team} />
       <span className="bm-admin-name">{e.adminName}</span>
       <span className="bm-admin-time-action">{adminLogAction(e, teams)}</span>
-      <span /><span /><span /><span /><span />
+      {/* type | status | end-type | overtime | start | end — all empty */}
+      <span /><span /><span /><span /><span /><span />
       <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.at)}</span>
     </li>
   );

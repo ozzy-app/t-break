@@ -19,7 +19,7 @@ export function LeaderPanel({
 }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmClearLog, setConfirmClearLog] = useState(false);
-  const [controlsOpen, setControlsOpen] = useState(true);
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [archiveDate, setArchiveDate] = useState(null);
   const [archiveLog, setArchiveLog] = useState(null);
   const [teamsEditOpen, setTeamsEditOpen] = useState(false);
@@ -91,7 +91,7 @@ export function LeaderPanel({
         />
 
         {/* Nu op pauze */}
-        <div className="bm-leader-section">
+        <div className="bm-leader-section bm-nop-section">
           <h3 className="bm-leader-h3">Nu op pauze</h3>
           {activeTeamIds.every((t) => state.teams[t].activeBreaks.length === 0) ? (
             <div className="bm-empty">Niemand op pauze.</div>

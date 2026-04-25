@@ -228,20 +228,20 @@ function ActivityLog({ logs }) {
           : <ul className="bm-admin-list">
               {logs.map(e => {
                 if (e.kind === 'admin') {
-                  // admin row: [empty] | naam | log tekst | [5 empty] | logtijd
+                  // admin row: [empty team] | naam | log tekst | [6 empty] | logtijd
                   return (
                     <li key={e.id} className="bm-admin-row bm-admin-row-admin">
                       <span />
                       <span className="bm-admin-name">{e.admin_name || e.user_name}</span>
                       <span className="bm-admin-time-action">{e.action}</span>
-                      <span /><span /><span /><span /><span />
+                      <span /><span /><span /><span /><span /><span />
                       <span className="bm-admin-tag bm-admin-tag-admin">
                         {fmtTime(e.started_at || e.created_at)}
                       </span>
                     </li>
                   );
                 }
-                // break row: [empty team] | naam | [spacer] | type | status | overtime | start | end | logtijd
+                // break row: 10-col: [empty team] | naam | [spacer] | type | [empty status] | end-type | overtime | start | end | logtijd
                 const EXPECTED = { brb: 180000, short: 900000, lunch: 1800000 };
                 const exp = EXPECTED[e.break_type] || 0;
                 const dur = e.duration_ms || 0;
@@ -256,6 +256,7 @@ function ActivityLog({ logs }) {
                     <span className={`bm-admin-type bm-admin-type-${e.break_type}`}>
                       {TYPES[e.break_type]?.label || '–'}
                     </span>
+                    <span />
                     <span>
                       {isLate
                         ? <span className="bm-admin-late-pill">Laat</span>
