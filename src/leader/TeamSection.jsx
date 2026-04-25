@@ -22,6 +22,11 @@ export function TeamSection({ team, teamData, me }) {
               type={type}
               state={teamData}
               me={me}
+              myUsage={{}}
+              myExtraBreaks={0}
+              myActive={null}
+              myQueueType={null}
+              myOffer={null}
               compact={false}
             />
           ))}
