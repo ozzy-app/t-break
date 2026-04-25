@@ -48,7 +48,7 @@ export default function App() {
 
   // Employee-derived state
   const myTeam = me?.team || null;
-  const myTeamData = myTeam ? state.teams[myTeam] : null;
+  const myTeamData = (myTeam && state?.teams?.[myTeam]) ? state.teams[myTeam] : null;
   const myActive = myTeamData ? myTeamData.activeBreaks.find((b) => b.userId === me.userId) : null;
   const myQueueType = myTeamData
     ? Object.keys(TYPES).find((t) => myTeamData.queues[t].some((q) => q.userId === me?.userId))
@@ -96,6 +96,15 @@ export default function App() {
     );
   }
   if (!me) return <AuthScreen onAuth={setMe} />;
+
+  // Wait for state to initialize before rendering anything that accesses state.teams
+  if (!state?.teams) {
+    return (
+      <div className="bm-root bm-center">
+        <div className="bm-loading">Laden…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="bm-root">
