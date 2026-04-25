@@ -1,177 +1,152 @@
-# Supabase CLI
+# T-Break
 
-[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=develop)](https://coveralls.io/github/supabase/cli?branch=develop) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
-](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
+A real-time break management app for teams. Employees claim timed break tickets — BRB (3 min), Short (15 min), Lunch (30 min) — while admins monitor who's on break, manage ticket availability per team, and review logs.
 
-[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+**Live at:** [tbreak.vercel.app](https://tbreak.vercel.app)
 
-This repository contains all the functionality for Supabase CLI.
+---
 
-- [x] Running Supabase locally
-- [x] Managing database migrations
-- [x] Creating and deploying Supabase Functions
-- [x] Generating types directly from your database schema
-- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
+## Features
 
-## Getting started
+- **Ticket-based breaks** — each team has a configurable pool of BRB, Short, and Lunch tickets
+- **Real-time sync** — all clients update instantly via Supabase Realtime
+- **Queue system** — employees join a waitlist when tickets are full; they receive a 5-minute claim window when a slot opens
+- **Admin panel** — manage ticket counts, end breaks, approve team change requests, view live status
+- **Overtime detection** — tracks and logs when employees return late; shown in the log with `LAAT +Xm`
+- **Dynamic teams** — admins can create, rename, recolor, and delete teams with a built-in HSL color picker
+- **Gebruikersbeheer** — full user management: approve accounts, assign teams, grant extra breaks, reset passwords, export logs
+- **Log archive** — daily logs preserved at midnight; browsable via calendar modal with CSV export per day or date range
+- **Dark mode** — persistent across sessions
+- **MFA support** — TOTP two-factor authentication via Supabase Auth
 
-### Install the CLI
+---
 
-Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
+## Tech stack
 
-```bash
-npm i supabase --save-dev
-```
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite 5 |
+| Backend / DB | Supabase (Postgres + Realtime + Auth) |
+| Hosting | Vercel |
+| Styling | Plain CSS with CSS variables |
 
-When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
+---
 
-```
-NODE_OPTIONS=--no-experimental-fetch yarn add supabase
-```
+## Prerequisites
 
-> **Note**
-For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
+- [Node.js](https://nodejs.org/) v18 or higher
+- npm v9 or higher (comes with Node)
+- A [Supabase](https://supabase.com/) project (free tier works fine)
 
-<details>
-  <summary><b>macOS</b></summary>
+---
 
-  Available via [Homebrew](https://brew.sh). To install:
+## Installation
 
-  ```sh
-  brew install supabase/tap/supabase
-  ```
-
-  To install the beta release channel:
-  
-  ```sh
-  brew install supabase/tap/supabase-beta
-  brew link --overwrite supabase-beta
-  ```
-  
-  To upgrade:
-
-  ```sh
-  brew upgrade supabase
-  ```
-</details>
-
-<details>
-  <summary><b>Windows</b></summary>
-
-  Available via [Scoop](https://scoop.sh). To install:
-
-  ```powershell
-  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
-  scoop install supabase
-  ```
-
-  To upgrade:
-
-  ```powershell
-  scoop update supabase
-  ```
-</details>
-
-<details>
-  <summary><b>Linux</b></summary>
-
-  Available via [Homebrew](https://brew.sh) and Linux packages.
-
-  #### via Homebrew
-
-  To install:
-
-  ```sh
-  brew install supabase/tap/supabase
-  ```
-
-  To upgrade:
-
-  ```sh
-  brew upgrade supabase
-  ```
-
-  #### via Linux packages
-
-  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
-
-  ```sh
-  sudo apk add --allow-untrusted <...>.apk
-  ```
-
-  ```sh
-  sudo dpkg -i <...>.deb
-  ```
-
-  ```sh
-  sudo rpm -i <...>.rpm
-  ```
-
-  ```sh
-  sudo pacman -U <...>.pkg.tar.zst
-  ```
-</details>
-
-<details>
-  <summary><b>Other Platforms</b></summary>
-
-  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
-
-  ```sh
-  go install github.com/supabase/cli@latest
-  ```
-
-  Add a symlink to the binary in `$PATH` for easier access:
-
-  ```sh
-  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
-  ```
-
-  This works on other non-standard Linux distros.
-</details>
-
-<details>
-  <summary><b>Community Maintained Packages</b></summary>
-
-  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
-  To install in your working directory:
-
-  ```bash
-  pkgx install supabase
-  ```
-
-  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
-</details>
-
-### Run the CLI
+### 1. Clone the repository
 
 ```bash
-supabase bootstrap
+git clone https://github.com/ozzy-app/t-break.git
+cd t-break
 ```
 
-Or using npx:
+### 2. Install dependencies
 
 ```bash
-npx supabase bootstrap
+npm install
 ```
 
-The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
+### 3. Configure environment variables
 
-## Docs
+Create a `.env` file in the project root:
 
-Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
-
-## Breaking changes
-
-We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
-
-However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
-
-## Developing
-
-To run from source:
-
-```sh
-# Go >= 1.22
-go run . help
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
+
+Both values are in your Supabase dashboard under **Project Settings → API**.
+
+### 4. Set up the database
+
+Run this migration in **Supabase Dashboard → SQL Editor**:
+
+```
+supabase/migration_teams.sql
+```
+
+This creates the `teams` table and seeds the default teams.
+
+The app also requires these tables in `app_state` (single row, id=1):
+`profiles`, `app_state`, `logs`, `team_change_requests`
+
+### 5. Configure Supabase Auth URLs
+
+In **Supabase Dashboard → Authentication → URL Configuration**:
+
+- **Site URL** → your deployment URL (e.g. `https://tbreak.vercel.app`)
+- **Redirect URLs** → add `https://tbreak.vercel.app/**` and `http://localhost:5173/**`
+
+### 6. Start the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+---
+
+## Build for production
+
+```bash
+npm run build        # outputs to dist/
+npm run preview      # preview the production build locally
+```
+
+Deploy to Vercel by connecting the GitHub repo — it auto-deploys on every push to `main`.  
+Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in **Vercel → Project → Settings → Environment Variables**.
+
+---
+
+## Project structure
+
+```
+t-break/
+├── src/
+│   ├── auth/           # Login / register screen
+│   ├── components/     # Shared UI (Header, Ticket, TicketRow, Toast…)
+│   ├── hooks/          # useAuth, useAppState, useAdminData, useDarkMode
+│   ├── leader/         # Admin panel components
+│   ├── lib/            # Supabase client, state, export, TeamsContext
+│   └── styles/         # globals.css
+├── supabase/
+│   └── migration_teams.sql
+├── index.html
+├── vite.config.js
+└── .env                # Not committed — create this file locally
+```
+
+---
+
+## First-time setup
+
+1. Register an account at the app URL
+2. In **Supabase Dashboard → Table Editor → profiles**, find your row and set `approved = true` and `is_leader = true`
+3. Log back in — you'll have full admin access
+4. Add employees by having them register; approve them from the **Gebruikersbeheer** panel inside the app
+
+---
+
+## Platform notes
+
+| OS | Notes |
+|---|---|
+| **macOS** | Works out of the box with Node from [nodejs.org](https://nodejs.org) or `brew install node` |
+| **Linux** | Use your package manager (`apt install nodejs npm`) or [nvm](https://github.com/nvm-sh/nvm) |
+| **Windows** | Install Node from [nodejs.org](https://nodejs.org); use PowerShell, Command Prompt, or Windows Terminal. WSL2 also works. |
+
+---
+
+## License
+
+Private — all rights reserved.
