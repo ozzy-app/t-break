@@ -365,34 +365,39 @@
       .bm-queue-banner {
         display: flex; align-items: center; justify-content: space-between;
         padding: 20px 28px; border-radius: 16px; gap: 20px;
-        background: var(--bg-2);
-        color: #f1f5f9;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        background: #e07b1a;
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(224,123,26,0.35);
         margin: 0;
       }
       .bm-dark .bm-queue-banner {
-        background: var(--bg-2);
+        background: #c96c10;
+        box-shadow: 0 8px 24px rgba(180,100,10,0.4);
       }
       .bm-queue-banner-left { display: flex; flex-direction: column; gap: 4px; }
       .bm-queue-banner-label {
         font-family: 'Geist Mono'; font-size: 10px; letter-spacing: 0.18em;
-        text-transform: uppercase; opacity: 0.6;
+        text-transform: uppercase; opacity: 0.85;
       }
       .bm-queue-banner-type {
         font-family: 'Bebas Neue'; font-size: 32px; letter-spacing: 0.04em;
         line-height: 1;
       }
       .bm-queue-banner-pos {
-        font-size: 13px; opacity: 0.75; margin-top: 2px;
+        font-size: 13px; opacity: 0.85; margin-top: 2px;
       }
+      /* Number badge — white background, orange text, same for all break types */
       .bm-queue-banner-pill {
         font-family: 'Bebas Neue'; font-size: 48px; letter-spacing: 0.04em;
         line-height: 1; padding: 8px 20px; border-radius: 12px;
         min-width: 90px; text-align: center;
+        background: #fff; color: #e07b1a;
       }
-      .bm-queue-banner-pill-brb   { background: #08AD8B; color: #fff; }
-      .bm-queue-banner-pill-short { background: #b93a39; color: #1a1a1a; }
-      .bm-queue-banner-pill-lunch { background: #b93a39; color: #1a1a1a; }
+      .bm-dark .bm-queue-banner-pill { background: #fff; color: #c96c10; }
+      /* Override per-type colors — all use the same orange/white scheme now */
+      .bm-queue-banner-pill-brb   { background: #fff; color: #e07b1a; }
+      .bm-queue-banner-pill-short { background: #fff; color: #e07b1a; }
+      .bm-queue-banner-pill-lunch { background: #fff; color: #e07b1a; }
 
       .t-active-wrap, .t-offer-wrap {
         display: flex; flex-direction: column; align-items: center;
