@@ -318,12 +318,12 @@ export function ArchiveViewer({ date, log, onClose, notify }) {
       </div>
       {log.length === 0
         ? <div className="bm-empty">Geen logs voor deze dag.</div>
-        : <>
+        : <div className="bm-log-wrap">
             <LogHeader gridTemplate={gridTemplate} onMouseDown={onMouseDown} />
             <ul className="bm-admin-list" style={{ '--log-grid': gridTemplate }}>
               {log.map((e, i) => <LogRow key={i} e={e} i={i} gridTemplate={gridTemplate} />)}
             </ul>
-          </>
+          </div>
       }
     </div>
   );
@@ -337,12 +337,12 @@ export function LogToday({ log }) {
       <h3 className="bm-leader-h3">Logboek vandaag</h3>
       {log.length === 0
         ? <div className="bm-empty">Nog niets gelogd.</div>
-        : <>
+        : <div className="bm-log-wrap">
             <LogHeader gridTemplate={gridTemplate} onMouseDown={onMouseDown} />
             <ul className="bm-admin-list" style={{ '--log-grid': gridTemplate }}>
               {log.slice(0, 60).map((e, i) => <LogRow key={i} e={e} i={i} gridTemplate={gridTemplate} />)}
             </ul>
-          </>
+          </div>
       }
     </div>
   );
