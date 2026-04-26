@@ -325,24 +325,30 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
     act(async (s) => {
       const t = s.teams[team];
       if (!t) { notify('Team niet gevonden', 'warn'); return null; }
-      // Skip pool check for admin-assigned breaks — this is intentional override
-      const breakEntry = {
-        id: uid(),
+      // Place a claimable offer in the user's queue slot — they claim it themselves
+      // Remove any existing offer of this type first to avoid duplicates
+      t.queues[type] = t.queues[type].filter(q => q.userId !== userId);
+      t.queues[type].push({
         userId,
         userName,
-        type,
-        startedAt: Date.now(),
-        fromQueue: false,
+        joinedAt: Date.now(),
+        offeredAt: Date.now(),   // immediately claimable
+        adminGranted: true,
+      });
+      // Admin action log entry
+      const entry = {
+        kind: 'admin',
+        action: `heeft een ${TYPES[type].label} toegewezen aan: ${userName}`,
+        adminName: me.name,
+        user_name: userName,
+        break_type: type,
         team,
-        adminAssigned: true,
+        started_at: new Date().toISOString(),
+        at: Date.now(),
       };
-      t.activeBreaks.push(breakEntry);
-      const { dailyKey } = TYPES[type];
-      if (dailyKey) {
-        if (!t.usage[userId]) t.usage[userId] = { date: todayStr(), short: 0, lunch: 0 };
-        t.usage[userId][dailyKey] += 1;
-      }
-      notify(`${TYPES[type].label} toegewezen aan ${userName}`, 'ok');
+      s.log.unshift(entry);
+      await insertLog(entry);
+      notify(`${TYPES[type].label} aangeboden aan ${userName} — wacht op claim`, 'ok');
       return s;
     });
 
