@@ -16,9 +16,13 @@ export function useResizableCols() {
     const startX = e.clientX;
     const startWidth = widths[colIndex];
     dragging.current = colIndex;
+    // Columns after the 1fr (index > 2) have their handle on the left edge,
+    // so dragging right should shrink and dragging left should grow (inverted).
+    const isAfterFlex = colIndex > 2;
 
     const onMove = (ev) => {
-      const delta = ev.clientX - startX;
+      const raw = ev.clientX - startX;
+      const delta = isAfterFlex ? -raw : raw;
       setWidths(prev => {
         const next = [...prev];
         next[colIndex] = Math.max(MIN_WIDTH, startWidth + delta);
@@ -44,18 +48,28 @@ export function useResizableCols() {
 export function LogHeader({ widths, gridTemplate, onMouseDown }) {
   return (
     <div className="bm-log-header" style={{ gridTemplateColumns: gridTemplate }}>
-      {COL_LABELS.map((label, i) => (
-        <div key={i} className="bm-log-header-cell">
-          <span>{label}</span>
-          {i < COL_LABELS.length - 1 && (
-            <div
-              className="bm-col-resize-handle"
-              onMouseDown={(e) => onMouseDown(i, e)}
-              title="Sleep om kolom te verbreden"
-            />
-          )}
-        </div>
-      ))}
+      {COL_LABELS.map((label, i) => {
+        const isAfterFlex = i > 2;
+        return (
+          <div key={i} className="bm-log-header-cell">
+            {isAfterFlex && i < COL_LABELS.length && (
+              <div
+                className="bm-col-resize-handle bm-col-resize-handle-left"
+                onMouseDown={(e) => onMouseDown(i, e)}
+                title="Sleep om kolom te verbreden"
+              />
+            )}
+            <span>{label}</span>
+            {!isAfterFlex && i < COL_LABELS.length - 1 && (
+              <div
+                className="bm-col-resize-handle"
+                onMouseDown={(e) => onMouseDown(i, e)}
+                title="Sleep om kolom te verbreden"
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

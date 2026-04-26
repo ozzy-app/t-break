@@ -641,6 +641,10 @@
         display: flex; align-items: center; justify-content: center;
         z-index: 2;
       }
+      /* Left-edge variant for columns after the 1fr flex column */
+      .bm-col-resize-handle-left {
+        right: auto; left: 0;
+      }
       .bm-col-resize-handle::after {
         content: ''; display: block;
         width: 2px; height: 14px;

@@ -3,6 +3,7 @@ import { sb } from '../lib/supabase';
 import { TYPES } from '../lib/constants';
 import { useTeams, getTeamIds, getTeamLabel, getTeamColor, getTeamTextColor } from '../lib/TeamsContext';
 import { fmtMs } from '../lib/helpers';
+import { exportUserLogs } from '../lib/export';
 
 // Is this user currently overrun, or did they have an overrun break today?
 function getUserOvertimeTeam(state, uid) {
@@ -46,26 +47,8 @@ function UserActionsModal({ u, state, me, onClose, onAssignTeam, onAssignLeader,
 
   const exportLogs = async () => {
     setBusy(true);
-    const { data } = await sb.from('logs').select('*').eq('user_id', u.uid).order('started_at', { ascending: false });
+    await exportUserLogs(u.uid, u.name, teams, notify);
     setBusy(false);
-    if (!data?.length) { notify?.('Geen logs gevonden', 'warn'); return; }
-    const rows = [
-      ['Datum', 'Type', 'Start', 'Einde', 'Duur (min)', 'Reden'],
-      ...data.map(r => [
-        r.log_date,
-        r.break_type || r.action || '',
-        r.started_at ? new Date(r.started_at).toLocaleString('nl-NL') : '',
-        r.ended_at   ? new Date(r.ended_at).toLocaleString('nl-NL')   : '',
-        r.duration_ms ? Math.round(r.duration_ms / 60000) : '',
-        r.end_reason || r.action || '',
-      ])
-    ];
-    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `tbreak-logs-${u.name.replace(/\s+/g,'-')}.csv`;
-    a.click();
     onClose();
   };
 
