@@ -16,7 +16,6 @@ export function TicketRow({
   onLeave,
   onClaim,
   compact = false,
-  ticketStyle,
 }) {
   const def = TYPES[type];
   const active = state.activeBreaks.filter((b) => b.type === type);
@@ -60,9 +59,7 @@ export function TicketRow({
 
   // Compact view — for admin overview
   if (compact) {
-    // Use ticketStyle colors if set, fall back to default def.color
-    const styleColors = ticketStyle?.[type];
-    const ticketColor = styleColors?.bg || def.color;
+    const ticketColor = def.color;
     const taken = active.length;
     const offered = offeredCount; // reserved for queue
     const avail = Math.max(0, cap - taken - offered);
@@ -132,7 +129,6 @@ export function TicketRow({
             onClick={queueOnClick}
             disabled={queueDisabled}
             disabledReason={disabledReason}
-            ticketStyle={ticketStyle}
           />
         ) : (
           Array.from({ length: available }).map((_, i) => (
@@ -145,7 +141,6 @@ export function TicketRow({
               stubBot="TIK: NEEM"
               useDash={def.useDash}
               ticketLabel={def.ticketLabel}
-              ticketStyle={ticketStyle}
             />
           ))
         )}

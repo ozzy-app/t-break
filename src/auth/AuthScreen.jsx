@@ -104,6 +104,7 @@ export function AuthScreen({ onAuth }) {
         <div className="bm-entry">
           <div className="bm-entry-eyebrow">T-BREAK</div>
           <h1 className="bm-entry-title">{mode === 'login' ? 'Inloggen' : 'Account aanmaken'}</h1>
+          <p className="bm-entry-sub">{mode === 'login' ? 'Log in met je werkaccount.' : 'Maak een account aan met je werkmail.'}</p>
           {error && <div className="bm-auth-error">{error}</div>}
           {mode === 'register' && (<>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -123,7 +124,7 @@ export function AuthScreen({ onAuth }) {
               </div>
             )}
           </>)}
-          <input className="bm-input" placeholder="Email" type="email" value={email}
+          <input className="bm-input" placeholder="Werkemail" type="email" value={email}
             onChange={e => setEmail(e.target.value)} style={{ marginBottom: '12px' }} />
           <div className="bm-pw-wrap" style={{ marginBottom: '20px' }}>
             <input className="bm-input" placeholder="Wachtwoord"

@@ -173,7 +173,7 @@
 
       /* Main */
       .bm-main {
-        max-width: 1800px; margin: 0 auto; padding: 28px 32px;
+        max-width: 1800px; margin: 0 auto; padding: 28px 16px;
         display: flex; flex-direction: column; gap: 36px;
         background: var(--bg);
       }
@@ -182,8 +182,8 @@
       .bm-content { display: contents; }
       .bm-content-leader {
         display: grid;
-        grid-template-columns: 1fr 3fr;
-        gap: 32px;
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
         align-items: start;
         background: var(--bg);
       }
@@ -467,12 +467,6 @@
       .t-row-tickets {
         display: flex; gap: 14px; flex-wrap: wrap;
         padding: 4px 0;
-        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.13));
-      }
-      /* Notched tickets get their shadow from the wrapper filter instead */
-      .t-row-tickets .t-notch { box-shadow: none !important; }
-      .t-row-tickets .t-notch:hover:not(.t-disabled):not(:disabled) {
-        filter: drop-shadow(0 10px 18px rgba(0,0,0,0.22));
       }
 
       /* Strip */
@@ -622,30 +616,17 @@
       .bm-dark .bm-nop-section { border-color: rgba(255,255,255,0.12); }
 
 
-      /* ── Resizable log column header ───────────────────────────── */
-      .bm-log-header {
-        display: grid;
-        align-items: center;
-        padding: 4px 14px 6px;
-        font-size: 10px; font-weight: 600; text-transform: uppercase;
-        letter-spacing: 0.08em; color: var(--ink-3);
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 2px;
-        position: relative;
-        user-select: none;
-      }
       .bm-log-header-cell {
         display: flex; align-items: center; position: relative;
-        padding-right: 10px; overflow: hidden; white-space: nowrap;
-        text-overflow: ellipsis;
+        overflow: hidden; white-space: nowrap; min-width: 0;
       }
-      .bm-log-header-cell span { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-      /* Drag handle — thin vertical line on the right edge */
+      .bm-log-header-label { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+      /* Resize handle sits at the right edge of its cell, centered on the grid line */
       .bm-col-resize-handle {
-        position: absolute; right: 0; top: -2px; bottom: -2px;
+        position: absolute; right: -4px; top: 0; bottom: 0;
         width: 8px; cursor: col-resize;
         display: flex; align-items: center; justify-content: center;
-        z-index: 2;
+        z-index: 10; flex-shrink: 0;
       }
       .bm-col-resize-handle::after {
         content: ''; display: block;
@@ -655,7 +636,23 @@
       }
       .bm-col-resize-handle:hover::after { background: var(--brand); height: 18px; }
 
-      .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+      /* ── Resizable log column header ───────────────────────────── */
+      .bm-log-header {
+        display: grid;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 14px 6px;
+        font-size: 10px; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--ink-3);
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2px;
+        position: relative;
+        user-select: none;
+        overflow: hidden; min-width: 0;
+      }
+      /* Wrap both header+list so column resize never blows out panel width */
+      .bm-log-wrap { overflow-x: hidden; min-width: 0; }
+      .bm-admin-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; overflow-x: hidden; min-width: 0; }
 
       /* ── Log rows: 9-column fixed grid ────────────────────────────
          team | naam | log tekst (1fr) | type | status | overtime | start | end | logtijd
@@ -698,7 +695,7 @@
       .bm-admin-type {
         font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
         font-weight: 700; padding: 2px 9px; border-radius: 99px;
-        white-space: nowrap; text-align: center;
+        white-space: nowrap; width: fit-content;
       }
       .bm-admin-type-brb { background: rgba(8,173,139,0.12); color: #08AD8B; }
       .bm-admin-type-short { background: rgba(220,38,38,0.10); color: var(--danger); }
@@ -793,9 +790,8 @@
         display: grid;
         grid-template-columns: 1fr 80px 130px 70px 110px;
         gap: 8px; padding: 6px 12px;
-        font-family: 'Geist Mono'; font-size: 10px;
-        text-transform: uppercase; letter-spacing: 0.12em;
-        color: var(--ink-3);
+        font-size: 10px; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--ink-3);
       }
       .bm-user-row {
         display: grid;
@@ -982,11 +978,11 @@
       /* Back button */
       .bm-back-btn {
         font-family: 'Geist'; font-size: 13px; font-weight: 600;
-        padding: 6px 14px; border-radius: 8px;
-        border: 1px solid var(--border); background: var(--bg);
-        color: var(--ink-2); cursor: pointer; transition: all 0.15s;
+        padding: 6px 14px; border-radius: 10px;
+        border: 1px solid transparent; background: var(--brand);
+        color: #fff; cursor: pointer; transition: all 0.15s;
       }
-      .bm-back-btn:hover { border-color: var(--brand); color: var(--brand); }
+      .bm-back-btn:hover { background: var(--brand-deep); }
 
       /* Users mgmt button next to Gebruikers heading */
       .bm-users-mgmt-btn {
@@ -1065,21 +1061,43 @@
       /* Card expanded body */
       .bm-um-card-body {
         border-top: 1px solid var(--border); padding: 16px 20px;
-        display: flex; flex-direction: column; gap: 12px;
+        display: flex; flex-direction: column; gap: 14px;
         background: var(--bg-2);
       }
+      /* Two-column layout inside expanded card */
+      .bm-um-body-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; align-items: start;
+      }
+      .bm-um-body-col {
+        display: flex; flex-direction: column; gap: 10px;
+      }
+      .bm-um-body-col:first-child {
+        border-right: 1px solid var(--border); padding-right: 28px;
+      }
+      .bm-um-body-col:last-child { padding-left: 16px; }
+      .bm-um-approval-row { grid-column: 1 / -1; }
       .bm-um-actions-row {
         display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
       }
       .bm-um-action-label {
         font-size: 11px; font-weight: 600; text-transform: uppercase;
-        letter-spacing: 0.08em; color: var(--ink-3); width: 80px; flex-shrink: 0;
+        letter-spacing: 0.08em; color: var(--ink-3); width: 106px; flex-shrink: 0;
       }
       .bm-um-usage { font-size: 12px; color: var(--ink-2); }
-      .bm-um-meta-row { font-size: 11px; color: var(--ink-3); }
+      .bm-um-meta-row { font-size: 11px; color: var(--ink-3); line-height: 1.8; }
 
       /* Per-user log inside card */
       .bm-um-log { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; }
+      /* Toon/Verberg activity log toggle — styled like Conventie/Vrij toggle */
+      .bm-um-log-toggle {
+        font-family: 'Geist'; font-size: 11px; font-weight: 600;
+        padding: 3px 10px; border-radius: 8px; cursor: pointer;
+        border: 1px solid var(--border); background: transparent;
+        color: var(--ink-2); transition: all 0.15s; white-space: nowrap;
+      }
+      .bm-um-log-toggle:hover { background: var(--bg-2); color: var(--ink); border-color: var(--border-strong); }
+      .bm-um-log-toggle-active { background: var(--brand); color: #fff; border-color: var(--brand); }
+      .bm-um-log-toggle-active:hover { background: var(--brand-deep); border-color: var(--brand-deep); }
       .bm-um-log-title {
         font-size: 11px; font-weight: 600; text-transform: uppercase;
         letter-spacing: 0.1em; color: var(--ink-3); margin-bottom: 8px;
@@ -1166,7 +1184,7 @@
 
       /* Compact ticket row — enlarged */
       .t-row-compact {
-        display: flex; align-items: center; gap: 14px; padding: 10px 6px;
+        display: flex; align-items: center; gap: 14px; padding: 10px 14px;
         border-bottom: 1px solid var(--border); font-size: 15px;
       }
       .t-row-compact:last-child { border-bottom: 0; }
@@ -1353,76 +1371,3 @@
       .bm-color-hex-row { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; color: var(--ink-3); }
       .bm-color-hex-row span { width: 28px; }
       .bm-color-hex-input { font-family: 'Geist Mono'; font-size: 13px; flex: 1; padding: 6px 10px; }
-
-      /* ── Ticket Customizer Modal ─────────────────────────────── */
-      .btc-modal { max-height: 92vh; width: 700px; max-width: 96vw; display: flex; flex-direction: column; overflow: hidden; }
-      .btc-body { display: grid; grid-template-columns: 1fr 220px; gap: 20px; padding: 4px 20px 8px; overflow-y: auto; flex: 1; }
-
-      .btc-controls { display: flex; flex-direction: column; gap: 10px; }
-      .btc-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); }
-
-      /* Presets */
-      .btc-presets { display: flex; gap: 6px; flex-wrap: wrap; }
-      .btc-preset-btn {
-        padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 500;
-        border: 1.5px solid var(--border); background: var(--bg-2); color: var(--ink);
-        cursor: pointer; transition: all 0.15s; white-space: nowrap;
-      }
-      .btc-preset-btn:hover { border-color: var(--brand); color: var(--brand); }
-      .btc-preset-active { border-color: var(--brand) !important; background: var(--brand) !important; color: #fff !important; }
-      .btc-preset-desc { font-size: 11px; color: var(--ink-3); font-style: italic; min-height: 14px; }
-
-      /* Font picker */
-      .btc-font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-      .btc-font-btn {
-        padding: 8px 10px; border-radius: 8px; font-size: 14px;
-        border: 1.5px solid var(--border); background: var(--bg-2); color: var(--ink);
-        cursor: pointer; transition: all 0.15s; text-align: left; white-space: nowrap; overflow: hidden;
-      }
-      .btc-font-btn:hover { border-color: var(--brand); }
-      .btc-font-active { border-color: var(--brand) !important; background: var(--brand) !important; color: #fff !important; }
-
-      /* Color section */
-      .btc-color-tabs { display: flex; gap: 6px; }
-      .btc-color-tab {
-        display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px;
-        border: 1.5px solid var(--border); background: var(--bg-2); color: var(--ink-2);
-        font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s;
-      }
-      .btc-color-tab-active { border-color: var(--border-strong); background: var(--bg); color: var(--ink); }
-      .btc-tab-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dot, #888); flex-shrink: 0; }
-      .btc-color-fields { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 10px; background: var(--bg-2); }
-      .btc-color-row { display: flex; align-items: center; gap: 8px; }
-      .btc-color-label { font-size: 12px; color: var(--ink-2); flex: 1; }
-      .btc-color-input { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); padding: 2px; cursor: pointer; background: none; }
-      .btc-hex-input { width: 78px; font-family: "Geist Mono", monospace; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; background: var(--bg); color: var(--ink); }
-
-      /* Preview panel */
-      .btc-preview-panel { display: flex; flex-direction: column; gap: 8px; align-items: center; }
-      .btc-type-tabs { display: flex; gap: 4px; }
-      .btc-type-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); background: none; color: var(--ink-2); cursor: pointer; }
-      .btc-type-tab-active { background: var(--bg-2); color: var(--ink); border-color: var(--border-strong); }
-      .btc-preview-wrap { display: flex; align-items: center; justify-content: center; min-height: 220px; padding: 16px; }
-      .btc-preview-ticket { display: flex; cursor: default; }
-
-      /* Font size sliders */
-      .btc-size-row { display: flex; align-items: center; gap: 8px; }
-      .btc-size-label { font-size: 12px; color: var(--ink-2); width: 36px; flex-shrink: 0; }
-      .btc-size-slider { flex: 1; accent-color: var(--brand); cursor: pointer; }
-      .btc-size-val { font-family: "Geist Mono", monospace; font-size: 11px; color: var(--ink-3); width: 32px; text-align: right; flex-shrink: 0; }
-
-      /* Footer */
-      .btc-footer { display: flex; gap: 8px; padding: 12px 20px 20px; border-top: 1px solid var(--border); align-items: center; }
-      .btc-reset-btn { margin-left: auto; }
-
-      /* Ticket notch outline — classic punched ticket shape.
-         Uses clip-path so shadows still work via filter: drop-shadow on .t-row-tickets wrapper */
-      .t-portrait.t-notch {
-        clip-path: path('M10,0 C4,0 0,4 0,10 L0,127 C0,133 -9,138 -9,138 C-9,138 0,143 0,149 L0,194 C0,200 4,204 10,204 L118,204 C124,204 128,200 128,194 L128,149 C128,143 137,138 137,138 C137,138 128,133 128,127 L128,10 C128,4 124,0 118,0 Z');
-        overflow: visible;
-      }
-
-      /* Aanpassen button above ticket overview */
-      .bm-customize-btn {
-        margin-bottom: 10px; align-self: flex-start;
-      }
