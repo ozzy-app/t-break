@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { formatDisplayName } from '../lib/formatName';
 import { TYPES } from '../lib/constants';
 import { useTeams, getTeamIds, getTeamLabel, getTeamColor, getTeamTextColor } from '../lib/TeamsContext';
 import { exportUserLogs, exportUserLogsRange } from '../lib/export';
@@ -12,7 +13,9 @@ const ONLINE_MS = 2 * 60 * 1000;
 function CreateUserModal({ onClose, onCreated, notify }) {
   const teams = useTeams();
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName]   = useState('');
+  const [extension, setExtension] = useState('');
   const [tempPassword, setTempPassword] = useState('');
   const [team, setTeam] = useState('');
   const [makeLeader, setMakeLeader] = useState(false);
@@ -20,15 +23,19 @@ function CreateUserModal({ onClose, onCreated, notify }) {
   const [showPw, setShowPw] = useState(false);
 
   const submit = async () => {
-    if (!email || !name || !tempPassword) {
+    if (!email || !firstName || !lastName || !extension || !tempPassword) {
       notify('Vul alle velden in', 'warn'); return;
+    }
+    if (lastName.trim().length < 2) {
+      notify('Achternaam moet minimaal 2 tekens zijn', 'warn'); return;
     }
     if (tempPassword.length < 8) {
       notify('Wachtwoord minimaal 8 tekens', 'warn'); return;
     }
+    const name = formatDisplayName(firstName, lastName, extension);
     setBusy(true);
     try {
-      await adminApi.createUser(email.trim(), name.trim(), tempPassword, team || null, makeLeader);
+      await adminApi.createUser(email.trim(), name, tempPassword, team || null, makeLeader);
       notify(`✓ ${name} aangemaakt`, 'ok');
       onCreated();
       onClose();
@@ -51,10 +58,23 @@ function CreateUserModal({ onClose, onCreated, notify }) {
         </div>
 
         <div className="bm-modal-section-label">Naam</div>
-        <div className="bm-modal-row">
-          <input className="bm-input bm-modal-select" placeholder="Volledige naam"
-            value={name} onChange={e => setName(e.target.value)} />
+        <div className="bm-modal-row" style={{ gap: 8 }}>
+          <input className="bm-input" style={{ flex: 1 }} placeholder="Voornaam"
+            value={firstName} onChange={e => setFirstName(e.target.value)} />
+          <input className="bm-input" style={{ flex: 1 }} placeholder="Achternaam"
+            value={lastName} onChange={e => setLastName(e.target.value)} />
         </div>
+        <div className="bm-modal-row">
+          <input className="bm-input bm-modal-select" placeholder="Toestelnummer (bijv. 210)"
+            value={extension} onChange={e => setExtension(e.target.value.replace(/\D/g, ''))} />
+        </div>
+        {firstName && lastName && lastName.length >= 2 && extension && (
+          <div style={{ fontSize: 11, color: 'var(--ink-3)', padding: '0 0 8px 0', fontFamily: 'Geist Mono' }}>
+            Wordt weergegeven als: <strong style={{ color: 'var(--ink)' }}>
+              {formatDisplayName(firstName, lastName, extension)}
+            </strong>
+          </div>
+        )}
 
         <div className="bm-modal-section-label">Email</div>
         <div className="bm-modal-row">
@@ -672,35 +692,68 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
   );
 }
 
-// Inline name edit
+// Inline name edit — uses three fields to enforce naming convention
 function NameEdit({ userId, currentName, onSaved, notify }) {
   const [editing, setEditing] = useState(false);
-  const [val, setVal] = useState(currentName);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName]   = useState('');
+  const [extension, setExtension] = useState('');
+
+  const startEdit = () => {
+    // Pre-fill by parsing current name if it matches convention, else leave blank
+    // Format: "Jane (JSm) 210"
+    const m = currentName.match(/^(\S+)\s+\(\w+\)\s+(\d+)$/);
+    if (m) {
+      setFirstName(m[1]);
+      setExtension(m[2]);
+      // We can't recover last name from the code alone, so leave blank for re-entry
+      setLastName('');
+    } else {
+      setFirstName(''); setLastName(''); setExtension('');
+    }
+    setEditing(true);
+  };
+
   const save = async () => {
-    if (!val.trim() || val === currentName) { setEditing(false); return; }
+    if (!firstName.trim() || !lastName.trim() || !extension.trim()) {
+      notify('Vul alle drie de velden in', 'warn'); return;
+    }
+    if (lastName.trim().length < 2) {
+      notify('Achternaam moet minimaal 2 tekens zijn', 'warn'); return;
+    }
+    const name = formatDisplayName(firstName, lastName, extension);
+    if (name === currentName) { setEditing(false); return; }
     try {
-      await adminApi.updateProfile(userId, { name: val.trim() });
-      onSaved(val.trim());
+      await adminApi.updateProfile(userId, { name });
+      onSaved(name);
       setEditing(false);
     } catch (e) { notify('Fout: ' + e.message, 'warn'); }
   };
+
+  const preview = firstName && lastName && lastName.length >= 2 && extension
+    ? formatDisplayName(firstName, lastName, extension) : null;
+
   return (
-    <div className="bm-um-actions-row">
+    <div className="bm-um-actions-row" style={{ flexWrap: 'wrap', gap: 6 }}>
       <span className="bm-um-action-label">Naam:</span>
-      {editing
-        ? <>
-            <input className="bm-input" style={{ flex: 1, maxWidth: 220 }} value={val}
-              onChange={e => setVal(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
-              autoFocus />
-            <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={save}>Opslaan</button>
-            <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(false)}>Annuleren</button>
-          </>
-        : <>
-            <span style={{ fontSize: 13 }}>{currentName}</span>
-            <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(true)}>✏ Wijzig naam</button>
-          </>
-      }
+      {editing ? <>
+        <input className="bm-input" style={{ width: 100 }} placeholder="Voornaam"
+          value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
+        <input className="bm-input" style={{ width: 110 }} placeholder="Achternaam"
+          value={lastName} onChange={e => setLastName(e.target.value)} />
+        <input className="bm-input" style={{ width: 70 }} placeholder="Toestel"
+          value={extension} onChange={e => setExtension(e.target.value.replace(/\D/g, ''))} />
+        {preview && (
+          <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono', alignSelf: 'center' }}>
+            → <strong style={{ color: 'var(--ink)' }}>{preview}</strong>
+          </span>
+        )}
+        <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={save}>Opslaan</button>
+        <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(false)}>Annuleren</button>
+      </> : <>
+        <span style={{ fontSize: 13, fontFamily: 'Geist Mono' }}>{currentName}</span>
+        <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={startEdit}>✏ Wijzig naam</button>
+      </>}
     </div>
   );
 }
