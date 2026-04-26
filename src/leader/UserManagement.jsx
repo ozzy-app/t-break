@@ -755,34 +755,44 @@ function CodeEdit({ userId, currentName, onSaved, notify }) {
 
 // Inline name edit — uses three fields to enforce naming convention
 function NameEdit({ userId, currentName, onSaved, notify }) {
-  const [editing, setEditing] = useState(false);
+  const isConvention = /^\S+\s+\([A-Za-z]{2,4}\)\s+\d+$/.test(currentName);
+
+  const [editing, setEditing]     = useState(false);
+  const [freeMode, setFreeMode]   = useState(!isConvention);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName]   = useState('');
   const [extension, setExtension] = useState('');
+  const [freeName, setFreeName]   = useState('');
 
   const startEdit = () => {
-    // Pre-fill by parsing current name if it matches convention, else leave blank
-    // Format: "Jane (JSm) 210"
-    const m = currentName.match(/^(\S+)\s+\(\w+\)\s+(\d+)$/);
-    if (m) {
-      setFirstName(m[1]);
-      setExtension(m[2]);
-      // We can't recover last name from the code alone, so leave blank for re-entry
+    if (isConvention) {
+      // Pre-fill first name + extension; last name can't be recovered from code
+      const m = currentName.match(/^(\S+)\s+\([A-Za-z]{2,4}\)\s+(\d+)$/);
+      setFirstName(m ? m[1] : '');
+      setExtension(m ? m[2] : '');
       setLastName('');
+      setFreeMode(false);
     } else {
-      setFirstName(''); setLastName(''); setExtension('');
+      setFreeName(currentName);
+      setFreeMode(true);
     }
     setEditing(true);
   };
 
   const save = async () => {
-    if (!firstName.trim() || !lastName.trim() || !extension.trim()) {
-      notify('Vul alle drie de velden in', 'warn'); return;
+    let name;
+    if (freeMode) {
+      name = freeName.trim();
+      if (!name) { notify('Voer een naam in', 'warn'); return; }
+    } else {
+      if (!firstName.trim() || !lastName.trim() || !extension.trim()) {
+        notify('Vul alle drie de velden in', 'warn'); return;
+      }
+      if (lastName.trim().length < 2) {
+        notify('Achternaam moet minimaal 2 tekens zijn', 'warn'); return;
+      }
+      name = formatDisplayName(firstName, lastName, extension);
     }
-    if (lastName.trim().length < 2) {
-      notify('Achternaam moet minimaal 2 tekens zijn', 'warn'); return;
-    }
-    const name = formatDisplayName(firstName, lastName, extension);
     if (name === currentName) { setEditing(false); return; }
     try {
       await adminApi.updateProfile(userId, { name });
@@ -791,24 +801,47 @@ function NameEdit({ userId, currentName, onSaved, notify }) {
     } catch (e) { notify('Fout: ' + e.message, 'warn'); }
   };
 
-  const preview = firstName && lastName && lastName.length >= 2 && extension
+  const preview = !freeMode && firstName && lastName && lastName.length >= 2 && extension
     ? formatDisplayName(firstName, lastName, extension) : null;
 
   return (
     <div className="bm-um-actions-row" style={{ flexWrap: 'wrap', gap: 6 }}>
       <span className="bm-um-action-label">Naam:</span>
       {editing ? <>
-        <input className="bm-input" style={{ width: 100 }} placeholder="Voornaam"
-          value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
-        <input className="bm-input" style={{ width: 110 }} placeholder="Achternaam"
-          value={lastName} onChange={e => setLastName(e.target.value)} />
-        <input className="bm-input" style={{ width: 70 }} placeholder="Toestel"
-          value={extension} onChange={e => setExtension(e.target.value.replace(/\D/g, ''))} />
-        {preview && (
-          <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono', alignSelf: 'center' }}>
-            → <strong style={{ color: 'var(--ink)' }}>{preview}</strong>
-          </span>
-        )}
+        {/* Mode toggle */}
+        <button
+          className={`bm-btn bm-btn-sm ${freeMode ? 'bm-btn-ghost' : 'bm-btn-primary'}`}
+          style={{ fontSize: 10, padding: '2px 8px' }}
+          onClick={() => setFreeMode(false)}
+          title="Gebruik naamconventie">
+          Conventie
+        </button>
+        <button
+          className={`bm-btn bm-btn-sm ${freeMode ? 'bm-btn-primary' : 'bm-btn-ghost'}`}
+          style={{ fontSize: 10, padding: '2px 8px' }}
+          onClick={() => setFreeMode(true)}
+          title="Vrije naam (bijv. Admin)">
+          Vrij
+        </button>
+        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: 6, paddingLeft: 2 }}>
+          {freeMode ? (
+            <input className="bm-input" style={{ width: 200 }} placeholder="Bijv. Admin"
+              value={freeName} onChange={e => setFreeName(e.target.value)}
+              autoFocus onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }} />
+          ) : <>
+            <input className="bm-input" style={{ width: 100 }} placeholder="Voornaam"
+              value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
+            <input className="bm-input" style={{ width: 110 }} placeholder="Achternaam"
+              value={lastName} onChange={e => setLastName(e.target.value)} />
+            <input className="bm-input" style={{ width: 70 }} placeholder="Toestel"
+              value={extension} onChange={e => setExtension(e.target.value.replace(/\D/g, ''))} />
+            {preview && (
+              <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono', alignSelf: 'center' }}>
+                → <strong style={{ color: 'var(--ink)' }}>{preview}</strong>
+              </span>
+            )}
+          </>}
+        </div>
         <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={save}>Opslaan</button>
         <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(false)}>Annuleren</button>
       </> : <>
