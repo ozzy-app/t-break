@@ -130,6 +130,7 @@ export function TicketRow({
             onClick={queueOnClick}
             disabled={queueDisabled}
             disabledReason={disabledReason}
+            ticketStyle={ticketStyle}
           />
         ) : (
           Array.from({ length: available }).map((_, i) => (
@@ -142,6 +143,7 @@ export function TicketRow({
               stubBot="TIK: NEEM"
               useDash={def.useDash}
               ticketLabel={def.ticketLabel}
+              ticketStyle={ticketStyle}
             />
           ))
         )}
