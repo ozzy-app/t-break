@@ -803,50 +803,49 @@ function NameEdit({ userId, currentName, onSaved, notify }) {
   const preview = !freeMode && firstName && lastName && lastName.length >= 2 && extension
     ? formatDisplayName(firstName, lastName, extension) : null;
 
+  if (!editing) return (
+    <div className="bm-um-actions-row">
+      <span className="bm-um-action-label">Naam:</span>
+      <span style={{ fontSize: 13, fontFamily: 'Geist Mono' }}>{currentName}</span>
+      <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={startEdit}>✏ Wijzig naam</button>
+    </div>
+  );
+
   return (
     <div className="bm-um-actions-row" style={{ flexWrap: 'wrap', gap: 6 }}>
       <span className="bm-um-action-label">Naam:</span>
-      {editing ? <>
-        {/* Mode toggle */}
-        <button
-          className={`bm-btn bm-btn-sm ${freeMode ? 'bm-btn-ghost' : 'bm-btn-primary'}`}
-          style={{ fontSize: 10, padding: '2px 8px' }}
-          onClick={() => setFreeMode(false)}
-          title="Gebruik naamconventie">
-          Conventie
-        </button>
-        <button
-          className={`bm-btn bm-btn-sm ${freeMode ? 'bm-btn-primary' : 'bm-btn-ghost'}`}
-          style={{ fontSize: 10, padding: '2px 8px' }}
-          onClick={() => setFreeMode(true)}
-          title="Vrije naam (bijv. Admin)">
-          Vrij
-        </button>
-        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: 6, paddingLeft: 2 }}>
-          {freeMode ? (
-            <input className="bm-input" style={{ width: 200 }} placeholder="Bijv. Admin"
-              value={freeName} onChange={e => setFreeName(e.target.value)}
-              autoFocus onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }} />
-          ) : <>
-            <input className="bm-input" style={{ width: 100 }} placeholder="Voornaam"
-              value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
-            <input className="bm-input" style={{ width: 110 }} placeholder="Achternaam"
-              value={lastName} onChange={e => setLastName(e.target.value)} />
-            <input className="bm-input" style={{ width: 70 }} placeholder="Toestel"
-              value={extension} onChange={e => setExtension(e.target.value.replace(/\D/g, ''))} />
-            {preview && (
-              <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono', alignSelf: 'center' }}>
-                → <strong style={{ color: 'var(--ink)' }}>{preview}</strong>
-              </span>
-            )}
-          </>}
-        </div>
-        <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={save}>Opslaan</button>
-        <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(false)}>Annuleren</button>
-      </> : <>
-        <span style={{ fontSize: 13, fontFamily: 'Geist Mono' }}>{currentName}</span>
-        <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={startEdit}>✏ Wijzig naam</button>
-      </>}
+      {/* Mode toggle */}
+      <button
+        className={`bm-um-log-toggle ${!freeMode ? 'bm-um-log-toggle-active' : ''}`}
+        onClick={() => setFreeMode(false)} title="Gebruik naamconventie">
+        Conventie
+      </button>
+      <button
+        className={`bm-um-log-toggle ${freeMode ? 'bm-um-log-toggle-active' : ''}`}
+        onClick={() => setFreeMode(true)} title="Vrije naam (bijv. Admin)">
+        Vrij
+      </button>
+      <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {freeMode ? (
+          <input className="bm-input" style={{ width: 200 }} placeholder="Bijv. Admin"
+            value={freeName} onChange={e => setFreeName(e.target.value)}
+            autoFocus onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }} />
+        ) : <>
+          <input className="bm-input" style={{ width: 100 }} placeholder="Voornaam"
+            value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
+          <input className="bm-input" style={{ width: 110 }} placeholder="Achternaam"
+            value={lastName} onChange={e => setLastName(e.target.value)} />
+          <input className="bm-input" style={{ width: 70 }} placeholder="Toestel"
+            value={extension} onChange={e => setExtension(e.target.value.replace(/\D/g, ''))} />
+          {preview && (
+            <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: 'Geist Mono', alignSelf: 'center' }}>
+              → <strong style={{ color: 'var(--ink)' }}>{preview}</strong>
+            </span>
+          )}
+        </>}
+      </div>
+      <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={save}>Opslaan</button>
+      <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(false)}>Annuleren</button>
     </div>
   );
 }
