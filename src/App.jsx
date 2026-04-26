@@ -14,7 +14,7 @@ import { useAuth } from './hooks/useAuth';
 import { useAppState } from './hooks/useAppState';
 import { useAdminData } from './hooks/useAdminData';
 import { TYPES } from './lib/constants';
-import { useTeams, getTeamIds, getTeamLabel, getTeamColor, getTeamTextColor } from './lib/TeamsContext';
+import { TicketCustomizerModal, loadTicketStyle, DEFAULT_TICKET_STYLE } from './leader/TicketCustomizer';
 import { todayStr } from './lib/helpers';
 
 export default function App() {
@@ -22,6 +22,13 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
   const [isEmployeeView, setIsEmployeeView] = useState(false);
+  const [customizerOpen, setCustomizerOpen] = useState(false);
+  const [ticketStyle, setTicketStyle] = useState(DEFAULT_TICKET_STYLE);
+
+  // Load saved ticket style on mount
+  useEffect(() => {
+    loadTicketStyle().then(s => { if (s) setTicketStyle(s); });
+  }, []);
 
   const notify = (message, tone = 'info') => setToast({ message, tone });
 
@@ -36,7 +43,7 @@ export default function App() {
   const {
     state, act,
     takeTicket, joinQueue, leaveQueue,
-    endMyBreak, endBreakFor, startBreakFor,
+    endMyBreak, endBreakFor,
     claimOffer, declineOffer,
     updateConfig, setDefaultConfig, loadDefaultConfig,
     grantExtraBreak, removeExtraBreak,
@@ -160,9 +167,19 @@ export default function App() {
         <div className={`bm-content ${me.isLeader && !isEmployeeView ? 'bm-content-leader' : ''}`}>
           <div className={`bm-rows ${myActive ? 'bm-rows-dim' : ''}`}>
             {me.isLeader && !isEmployeeView ? (
-              getTeamIds(teams).filter(t => state.teams?.[t]).map((team) => (
-                <TeamSection key={team} team={team} teamData={state.teams[team]} me={me} compact />
-              ))
+              <>
+                <button className="bm-cal-btn bm-customize-btn" onClick={() => setCustomizerOpen(true)}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="13.5" cy="6.5" r="2"/><circle cx="6.5" cy="13.5" r="2"/><circle cx="17.5" cy="14.5" r="2"/>
+                    <path d="M12 20a8 8 0 1 0-8-8"/>
+                    <path d="M17 20h4"/><path d="M19 18v4"/>
+                  </svg>
+                  Aanpassen
+                </button>
+                {getTeamIds(teams).filter(t => state.teams?.[t]).map((team) => (
+                  <TeamSection key={team} team={team} teamData={state.teams[team]} me={me} compact ticketStyle={ticketStyle} />
+                ))}
+              </>
             ) : myTeam ? (
               <>
                 <div
@@ -188,6 +205,7 @@ export default function App() {
                     onTake={() => takeTicket(type)}
                     onJoin={() => joinQueue(type)}
                     onLeave={() => leaveQueue(type)}
+                    ticketStyle={ticketStyle}
                     onClaim={() =>
                       myOffer && myOffer.type === type ? claimOffer(type) : undefined
                     }
@@ -216,7 +234,6 @@ export default function App() {
                   me={me}
                   onUpdateConfig={updateConfig}
                   onEndBreak={endBreakFor}
-                  onStartBreak={startBreakFor}
                   onReset={resetAll}
                   onClearLog={clearLog}
                   onGrantExtraBreak={grantExtraBreak}
@@ -247,6 +264,13 @@ export default function App() {
         )}
       </main>
       {toast && <Toast message={toast.message} tone={toast.tone} />}
+      {customizerOpen && (
+        <TicketCustomizerModal
+          currentStyle={ticketStyle}
+          onApply={s => setTicketStyle(s)}
+          onClose={() => setCustomizerOpen(false)}
+        />
+      )}
     </div>
   );
 }

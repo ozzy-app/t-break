@@ -16,6 +16,7 @@ export function TicketRow({
   onLeave,
   onClaim,
   compact = false,
+  ticketStyle,
 }) {
   const def = TYPES[type];
   const active = state.activeBreaks.filter((b) => b.type === type);
