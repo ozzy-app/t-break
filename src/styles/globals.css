@@ -617,24 +617,17 @@
 
 
       .bm-log-header-cell {
-        display: flex; align-items: center;
-        padding: 0 6px; overflow: hidden; white-space: nowrap;
-        text-overflow: ellipsis; min-width: 0;
+        display: flex; align-items: center; position: relative;
+        padding: 0 4px 0 6px; overflow: hidden; white-space: nowrap;
+        min-width: 0;
       }
-      .bm-log-header-cell span { overflow: hidden; text-overflow: ellipsis; }
-      /* Handle overlay — same grid as the header, sits on top */
-      .bm-log-handle-layer {
-        position: absolute; inset: 0;
-        display: grid; pointer-events: none;
-      }
-      .bm-log-handle-slot {
-        position: relative; pointer-events: none;
-      }
+      .bm-log-header-label { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+      /* Resize handle sits at the right edge of its cell, centered on the grid line */
       .bm-col-resize-handle {
         position: absolute; right: -4px; top: 0; bottom: 0;
-        width: 8px; cursor: col-resize; pointer-events: all;
+        width: 8px; cursor: col-resize;
         display: flex; align-items: center; justify-content: center;
-        z-index: 10;
+        z-index: 10; flex-shrink: 0;
       }
       .bm-col-resize-handle::after {
         content: ''; display: block;
