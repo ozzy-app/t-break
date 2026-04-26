@@ -554,6 +554,11 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                       notify(`Naam gewijzigd naar ${n}`, 'ok'); refresh();
                     }} notify={notify} />
 
+                    {/* Code edit — for collision cases like JSm */}
+                    <CodeEdit userId={u.id} currentName={u.name} onSaved={(n) => {
+                      notify(`Afkorting gewijzigd`, 'ok'); refresh();
+                    }} notify={notify} />
+
                     {/* Team */}
                     <div className="bm-um-actions-row">
                       <span className="bm-um-action-label">Team:</span>
@@ -689,6 +694,62 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
           onClose={() => setModal(null)} notify={notify} />
       )}
     </section>
+  );
+}
+
+// Swap just the (XXX) code in a stored display name, keeping the rest intact.
+// "Jane (JSm) 210"  +  "JDo"  →  "Jane (JDo) 210"
+function swapCode(displayName, newCode) {
+  return displayName.replace(/\([A-Za-z]{2,4}\)/, `(${newCode})`);
+}
+
+// Inline code edit — lets admin fix the 3-letter identifier only
+function CodeEdit({ userId, currentName, onSaved, notify }) {
+  const [editing, setEditing] = useState(false);
+  const codeMatch = currentName.match(/\(([A-Za-z]{2,4})\)/);
+  const currentCode = codeMatch ? codeMatch[1] : '';
+  const [code, setCode] = useState(currentCode);
+
+  const open = () => { setCode(currentCode); setEditing(true); };
+
+  const save = async () => {
+    const trimmed = code.trim();
+    if (!trimmed || trimmed === currentCode) { setEditing(false); return; }
+    if (trimmed.length < 2 || trimmed.length > 4) {
+      notify('Code moet 2–4 letters zijn', 'warn'); return;
+    }
+    const newName = swapCode(currentName, trimmed);
+    try {
+      await adminApi.updateProfile(userId, { name: newName });
+      onSaved(newName);
+      setEditing(false);
+    } catch (e) { notify('Fout: ' + e.message, 'warn'); }
+  };
+
+  if (!codeMatch) return null; // name not in convention format, skip
+
+  return (
+    <div className="bm-um-actions-row">
+      <span className="bm-um-action-label">Afkorting:</span>
+      {editing ? <>
+        <span style={{ fontSize: 13, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>(</span>
+        <input
+          className="bm-input"
+          style={{ width: 64, fontFamily: 'Geist Mono', textAlign: 'center', padding: '4px 6px' }}
+          value={code}
+          maxLength={4}
+          autoFocus
+          onChange={e => setCode(e.target.value.replace(/[^A-Za-z]/g, ''))}
+          onKeyDown={e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
+        />
+        <span style={{ fontSize: 13, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>)</span>
+        <button className="bm-btn bm-btn-primary bm-btn-sm" onClick={save}>Opslaan</button>
+        <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setEditing(false)}>Annuleren</button>
+      </> : <>
+        <span style={{ fontSize: 13, fontFamily: 'Geist Mono', color: 'var(--ink-2)' }}>({currentCode})</span>
+        <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={open}>✏ Wijzig afkorting</button>
+      </>}
+    </div>
   );
 }
 
