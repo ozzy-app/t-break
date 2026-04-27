@@ -51,7 +51,7 @@ export default function App() {
     state, act,
     takeTicket, joinQueue, leaveQueue,
     endMyBreak, endBreakFor, startBreakFor,
-    claimOffer, declineOffer,
+    claimOffer, declineOffer, claimAdminOffer,
     updateConfig, setDefaultConfig, loadDefaultConfig,
     grantExtraBreak, removeExtraBreak,
     assignLeader, assignTeam, resetAll, clearLog,
@@ -73,6 +73,8 @@ export default function App() {
         return e?.offeredAt ? { type: myQueueType, offeredAt: e.offeredAt } : null;
       })()
     : null;
+  // Admin super ticket offer (separate from queue)
+  const myAdminOffer = myTeamData?.adminOffers?.[me.userId] || null;
   const myUsage = myTeamData
     ? myTeamData.usage[me.userId] || { date: todayStr(), short: 0, lunch: 0 }
     : { date: todayStr(), short: 0, lunch: 0 };
@@ -143,7 +145,16 @@ export default function App() {
             userId={me.userId}
           />
         )}
-        {myOffer && !myActive && (
+        {myAdminOffer && !myActive && (
+          <OfferTicket
+            type={myAdminOffer.type}
+            offeredAt={myAdminOffer.offeredAt}
+            onClaim={claimAdminOffer}
+            onDecline={() => {}}
+            isAdminGrant={true}
+          />
+        )}
+        {myOffer && !myActive && !myAdminOffer && (
           <OfferTicket
             type={myOffer.type}
             offeredAt={myOffer.offeredAt}
@@ -179,6 +190,15 @@ export default function App() {
               ))
             ) : myTeam ? (
               <>
+                <div
+                  className="bm-team-label-pill"
+                  style={{
+                    background: getTeamColor(teams, myTeam),
+                    color: getTeamTextColor(teams, myTeam),
+                  }}
+                >
+                  {getTeamLabel(teams, myTeam)}
+                </div>
                 {myTeamData ? Object.keys(TYPES).map((type) => (
                   <TicketRow
                     key={type}

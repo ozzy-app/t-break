@@ -1,7 +1,14 @@
+const IconCrown = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 20h20M4 20 2 8l5 4 5-8 5 8 5-4-2 12H4z"/>
+  </svg>
+);
+
 import { TYPES, CLAIM_WINDOW_SEC } from '../lib/constants';
 import { fmt } from '../lib/helpers';
 
-export function OfferTicket({ type, offeredAt, onClaim, onDecline }) {
+export function OfferTicket({ type, offeredAt, onClaim, onDecline, isAdminGrant = false }) {
   const expiresAt = offeredAt + CLAIM_WINDOW_SEC * 1000;
   const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
   const pct = Math.max(0, Math.min(100, (remaining / CLAIM_WINDOW_SEC) * 100));
@@ -63,7 +70,7 @@ export function OfferTicket({ type, offeredAt, onClaim, onDecline }) {
               </svg>
               )}
               <div className="t-type-l">{def.useDash ? `— ${def.ticketLabel}` : def.ticketLabel}</div>
-              <div className="t-status-l">TICKET KLAAR</div>
+              <div className="t-status-l">{isAdminGrant ? <span style={{display:'flex',alignItems:'center',gap:4}}><IconCrown /> SUPER TICKET</span> : 'TICKET KLAAR'}</div>
             </div>
             <div className="t-perf-v">
               <span className="t-hole t-hole-t" />
@@ -83,9 +90,11 @@ export function OfferTicket({ type, offeredAt, onClaim, onDecline }) {
         <button className="bm-btn bm-btn-dark bm-btn-lg" onClick={() => { onClaim(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
           Claim nu
         </button>
-        <button className="bm-btn bm-btn-ghost" onClick={onDecline}>
-          Weigeren
-        </button>
+        {!isAdminGrant && (
+          <button className="bm-btn bm-btn-ghost" onClick={onDecline}>
+            Weigeren
+          </button>
+        )}
       </div>
       <div className="t-offer-sub">
         {urgent ? 'Venster sluit' : 'Maak af wat je doet, dan claimen'}

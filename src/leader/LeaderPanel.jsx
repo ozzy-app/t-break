@@ -4,7 +4,7 @@ import { TeamControls } from './TeamControls';
 import { UsersTable } from './UsersTable';
 import { AdminActiveRow } from './AdminActiveRow';
 import { CalendarButton, ArchiveViewer, LogToday } from './ArchiveViewer';
-import { exportDayLogs } from '../lib/export';
+import { exportStateLogs } from '../lib/export';
 import { TeamEditorModal } from './TeamEditor';
 import { useTeams, getTeamIds, getTeamLabel, getTeamColor } from '../lib/TeamsContext';
 
@@ -175,7 +175,7 @@ export function LeaderPanel({
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5h10m-8 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1m-7 0 1 8h6l1-8"/></svg>
                 Logboek wissen
               </button>
-              <button className="bm-cal-btn" onClick={() => exportDayLogs(new Date().toISOString().slice(0,10), teams, notify)}
+              <button className="bm-cal-btn" onClick={() => exportStateLogs(state.log, teams, notify)}
                 title="Exporteer het logboek van vandaag direct als .csv — handig voor noodgevallen vóór het wissen.">
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v8m-4-3 4 4 4-4"/><path d="M3 14h10"/></svg>
                 Export log

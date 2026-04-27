@@ -179,3 +179,49 @@ export async function exportRangeLogs(from, to, teams = [], notify) {
   if (!data) return;
   download(toCsv(await buildRows(data, teams)), `tbreak-logs-${from}--${to}.csv`);
 }
+
+/** Export directly from state.log (live in-memory log, not yet in DB archive) */
+export function exportStateLogs(log = [], teams = [], notify) {
+  const getLabel = (id) => teams.find(t => t.id === id)?.label || id || '';
+
+  const fmtTime = (ts) => ts
+    ? new Date(ts).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
+    : '';
+  const fmtDt = (ts) => ts
+    ? new Date(ts).toLocaleString('nl-NL', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      })
+    : '';
+
+  const logtekstMap = {
+    brb: 'is even BRB gegaan...', short: 'heeft korte pauze genomen', lunch: 'heeft lunchpauze genomen',
+  };
+  const endReasonMap = { early: 'VROEG', timer: 'TIMER', forfeit: 'VERLOPEN', 'leader-ended': 'ADMIN' };
+
+  const rows = (log || [])
+    .filter(e => e.kind !== 'admin' && e.type && ['brb','short','lunch'].includes(e.type))
+    .map(e => {
+      const durMs  = (e.startedAt && e.endedAt) ? e.endedAt - e.startedAt : 0;
+      const expMs  = (EXPECTED_SEC[e.type] || 0) * 1000;
+      const overMs = expMs > 0 && durMs > expMs ? durMs - expMs : 0;
+      const isLate = overMs > 0;
+      const eindstatus = isLate ? 'LAAT' : (endReasonMap[e.endReason] || e.endReason || '');
+      return [
+        getLabel(e.team || ''),
+        e.userName || '',
+        logtekstMap[e.type] || '',
+        (e.type || '').toUpperCase(),
+        eindstatus,
+        durMs > 0 ? msToHmmss(durMs) : '',
+        isLate ? msToHmmss(overMs) : '',
+        fmtTime(e.startedAt),
+        fmtTime(e.endedAt),
+        fmtDt(e.endedAt || e.startedAt),
+      ];
+    });
+
+  if (!rows.length) { notify?.('Geen logs gevonden in huidig logboek', 'warn'); return; }
+  const date = new Date().toISOString().slice(0, 10);
+  download(toCsv(rows), `tbreak-log-live-${date}.csv`);
+}

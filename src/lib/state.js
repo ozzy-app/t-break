@@ -10,6 +10,7 @@ export function blankTeam(cfg) {
     queues: { brb: [], short: [], lunch: [] },
     usage: {},
     extraBreaks: {},
+    adminOffers: {},
   };
 }
 
@@ -57,9 +58,10 @@ export async function loadShared() {
       state.teams[team] = {
         config: { ...DEFAULT_TEAM_CONFIG, ...(rawConfig[team] || {}) },
         activeBreaks: rawBreaks[team] || [],
-        queues: { brb: [], short: [], lunch: [], ...(rawQueues[team] || {}) },
+        queues: { brb: [], short: [], lunch: [], ...Object.fromEntries(Object.entries(rawQueues[team] || {}).filter(([k]) => k !== '_adminOffers')) },
         usage: rawUsage[team] || {},
         extraBreaks: rawExtra[team] || {},
+        adminOffers: (rawQueues[team] || {})._adminOffers || {},
       };
     }
     return state;
@@ -78,7 +80,7 @@ export async function saveShared(s) {
       if (!t) continue;
       config[team] = t.config;
       activeBreaks[team] = t.activeBreaks;
-      queues[team] = t.queues;
+      queues[team] = { ...t.queues, _adminOffers: t.adminOffers || {} };
       usage[team] = t.usage;
       extraBreaks[team] = t.extraBreaks;
     }
@@ -246,6 +248,7 @@ export function cleanup(state) {
       continue;
     }
     if (!t.extraBreaks) t.extraBreaks = {};
+    if (!t.adminOffers) t.adminOffers = {};
     if (!t.usage) t.usage = {};
 
     // Stale usage reset

@@ -259,6 +259,37 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
       return s;
     });
 
+  const claimAdminOffer = () =>
+    act(async (s) => {
+      // Find admin offer for this user across all teams
+      for (const [teamId, t] of Object.entries(s.teams)) {
+        if (!t.adminOffers) continue;
+        const offer = t.adminOffers[me.userId];
+        if (!offer) continue;
+        const { type } = offer;
+        const def = TYPES[type];
+        // Remove offer
+        delete t.adminOffers[me.userId];
+        // Start break directly — no queue, no daily limit check
+        const breakEntry = {
+          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+          userId: me.userId, userName: me.name,
+          type, team: teamId,
+          startedAt: Date.now(),
+          adminGranted: true,
+        };
+        t.activeBreaks.push(breakEntry);
+        // Log it
+        const entry = { ...breakEntry, kind: 'break', endReason: null };
+        s.log.unshift(entry);
+        notify(`${def.full} gestart (super ticket)`, 'ok');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return s;
+      }
+      notify('Geen super ticket gevonden', 'warn');
+      return null;
+    });
+
   const claimOffer = (type) =>
     act(async (s) => {
       if (!me.team) return null;
@@ -325,17 +356,13 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
     act(async (s) => {
       const t = s.teams[team];
       if (!t) { notify('Team niet gevonden', 'warn'); return null; }
-      // Place a claimable offer in the user's queue slot — they claim it themselves
-      // Remove any existing offer of this type first to avoid duplicates
-      t.queues[type] = t.queues[type].filter(q => q.userId !== userId);
-      t.queues[type].push({
-        userId,
-        userName,
-        joinedAt: Date.now(),
-        offeredAt: Date.now(),   // immediately claimable
+      // Admin super ticket — stored separately, never touches the queue
+      if (!t.adminOffers) t.adminOffers = {};
+      t.adminOffers[userId] = {
+        userId, userName, type, team,
+        offeredAt: Date.now(),
         adminGranted: true,
-      });
-      // Admin action log entry
+      };
       const entry = {
         kind: 'admin',
         action: `heeft een ${TYPES[type].label} toegewezen aan: ${userName}`,
@@ -348,7 +375,7 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
       };
       s.log.unshift(entry);
       await insertLog(entry);
-      notify(`${TYPES[type].label} aangeboden aan ${userName} — wacht op claim`, 'ok');
+      notify(`${TYPES[type].label} super ticket aangeboden aan ${userName}`, 'ok');
       return s;
     });
 
