@@ -18,11 +18,11 @@
         --t-brb-bg:       #ffffff;
         --t-brb-fg:       #d82335;
         --t-brb-border:   #d82335;
-        --t-short-bg:     #d82335;
+        --t-short-bg:     #b0001f;
         --t-short-fg:     #ffffff;
         --t-short-acc:    #b0001f;
-        --t-short-bot-bg: #ffffff;
-        --t-short-bot-fg: #d82335;
+        --t-short-bot-bg: #fff6f6;
+        --t-short-bot-fg: #b0001f;
         --t-lunch-bg:     #b0001f;
         --t-lunch-fg:     #ffffff;
         --t-lunch-acc:    #d82335;
@@ -52,11 +52,11 @@
         --t-brb-bg:        #ffffff;
         --t-brb-fg:        #e8364a;
         --t-brb-border:    #e8364a;
-        --t-short-bg:      #c01e2e;
+        --t-short-bg:      #8a1520;
         --t-short-fg:      #ffffff;
         --t-short-acc:     #8a0015;
-        --t-short-bot-bg:  #ffffff;
-        --t-short-bot-fg:  #c01e2e;
+        --t-short-bot-bg:  #2e1a1a;
+        --t-short-bot-fg:  #e05555;
         --t-lunch-bg:      #8a0015;
         --t-lunch-fg:      #ffffff;
         --t-lunch-acc:     #c01e2e;
@@ -865,7 +865,7 @@
       .bm-dark .bm-admin-type-brb { background: transparent; color: #e8364a; border-color: #e8364a; }
       .bm-dark .bm-admin-type-short { background: linear-gradient(to right, #c01e2e 50%, #2b2b2b 50%); border-color: #e8364a; color: transparent; }
       .bm-dark .bm-admin-type-short::before { color: #ffffff; }
-      .bm-dark .bm-admin-type-short::after { color: #e8364a; }
+      .bm-dark .bm-admin-type-short::after { color: #e05555; }
       .bm-dark .bm-admin-type-lunch { background: #c01e2e; border-color: #c01e2e; }
       .bm-admin-log-text { font-size: 12px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
       .bm-admin-time-cell { font-family: 'Inter'; font-size: 11px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
@@ -888,10 +888,10 @@
       .bm-admin-late-pill {
         font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
         padding: 2px 9px; border-radius: 99px;
-        background: #b93a39; color: #fff;
+        background: #d82335; color: #fff;
         white-space: nowrap; text-align: center; display: inline-block;
       }
-      .bm-admin-tag-late { background: #b93a39; color: #fff; font-weight: 700; }
+      .bm-admin-tag-late { background: #d82335; color: #fff; font-weight: 700; }
       /* Overtime cell */
       .bm-admin-overtime {
         font-family: 'Inter'; font-size: 11px; font-weight: 600;
