@@ -7,6 +7,16 @@ import { fmtMs } from '../lib/helpers';
 import { adminApi } from '../lib/adminApi';
 import { sb } from '../lib/supabase';
 
+// SVG crown — matches Header.jsx
+const IconCrown = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 20h20"/>
+    <path d="m3 9 4 4 5-8 5 8 4-4 1 11H2L3 9z"/>
+  </svg>
+);
+
+
 const ONLINE_MS = 2 * 60 * 1000;
 
 // ── Create user modal ────────────────────────────────────────────
@@ -520,7 +530,7 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                   <div className="bm-um-card-left">
                     <span className={`bm-um-status-dot ${u.isOnline ? 'bm-um-status-online' : 'bm-um-status-offline'}`}
                       title={u.isOnline ? 'Online' : 'Offline'} />
-                    {u.isLeader && <span className="bm-um-crown" title="Admin">♛</span>}
+                    {u.isLeader && <span className="bm-um-crown" title="Admin"><IconCrown /></span>}
                     <div>
                       <div className="bm-um-name">
                         {u.name}
@@ -604,7 +614,7 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                               await adminApi.updateProfile(u.id, { is_leader: !u.isLeader });
                               refresh();
                             }}>
-                            {u.isLeader ? '♛ Admin — klik om te verwijderen' : '♛ Maak admin'}
+                            {u.isLeader ? 'Admin — klik om te verwijderen' : 'Maak admin'}
                           </button>
                         </div>
 

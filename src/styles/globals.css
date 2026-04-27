@@ -106,14 +106,16 @@
       .bm-header-team-pill {
         font-family: 'Inter'; font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
         padding: 6px 20px; border-radius: 99px;
-        border: 1.5px solid var(--brand);
-        background: transparent; color: var(--brand);
+        border: 1.5px solid var(--brand) !important;
+        background: transparent !important; color: var(--brand) !important;
         cursor: pointer; transition: all 0.18s;
         line-height: 1.2; text-transform: uppercase; white-space: nowrap;
       }
       .bm-header-team-pill:hover:not(:disabled) { opacity: 0.82; transform: translateY(-1px); }
       .bm-header-team-pill:disabled { cursor: default; }
-      .bm-header-team-pill-active { background: var(--brand); color: #fff; font-weight: 700; }
+      .bm-header-team-pill-active {
+        background: var(--brand) !important; color: #fff !important; font-weight: 700;
+      }
       .bm-header-team-name {
         font-family: 'Inter'; font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
         text-transform: uppercase; line-height: 1;
@@ -155,7 +157,7 @@
         font-family: 'Inter'; font-size: 20px; font-weight: 900; letter-spacing: -0.01em;
         color: var(--ink);
       }
-      .bm-header-right { position: relative; }
+      .bm-header-right { position: relative; display: flex; align-items: center; gap: 10px; }
       .bm-chip {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 8px 18px; border-radius: 999px;
@@ -181,6 +183,7 @@
         box-shadow: 0 12px 28px rgba(0,0,0,0.12); z-index: 20;
       }
       .bm-menu-icon { display: flex; align-items: center; color: var(--brand); flex-shrink: 0; }
+      .bm-menu-icon svg { width: 16px; height: 16px; }
       .bm-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
       .bm-menu-item {
         width: 100%; text-align: left; padding: 11px 16px;

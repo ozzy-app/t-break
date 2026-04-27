@@ -107,9 +107,7 @@ export function Header({ me, onSignOut, onToggleLeader, isEmployeeView, notify, 
             <button
               key={t}
               className={`bm-header-team-pill ${myTeam === t ? 'bm-header-team-pill-active' : ''}`}
-              style={myTeam === t
-                ? { background: getTeamColor(teams, t), color: getTeamTextColor(teams, t) }
-                : {}}
+
               onClick={() => myTeam !== t && onRequestTeamSwitch?.(t)}
             >
               {getTeamLabel(teams, t)}
