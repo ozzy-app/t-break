@@ -5,7 +5,6 @@ import { UsersTable } from './UsersTable';
 import { AdminActiveRow } from './AdminActiveRow';
 import { CalendarButton, ArchiveViewer, LogToday } from './ArchiveViewer';
 import { exportDayLogs } from '../lib/export';
-import { useTeams } from '../lib/TeamsContext';
 import { TeamEditorModal } from './TeamEditor';
 import { useTeams, getTeamIds, getTeamLabel, getTeamColor } from '../lib/TeamsContext';
 
