@@ -4,6 +4,8 @@ import { TeamControls } from './TeamControls';
 import { UsersTable } from './UsersTable';
 import { AdminActiveRow } from './AdminActiveRow';
 import { CalendarButton, ArchiveViewer, LogToday } from './ArchiveViewer';
+import { exportDayLogs } from '../lib/export';
+import { useTeams } from '../lib/TeamsContext';
 import { TeamEditorModal } from './TeamEditor';
 import { useTeams, getTeamIds, getTeamLabel, getTeamColor } from '../lib/TeamsContext';
 
@@ -164,13 +166,20 @@ export function LeaderPanel({
             </div>
           ) : (
             <>
-              <button className="bm-cal-btn" onClick={() => setConfirmReset(true)}>
+              <button className="bm-cal-btn" onClick={() => setConfirmReset(true)}
+                title="Reset alle actieve pauzes, wachtrijen en daggebruik voor alle teams. Kan niet ongedaan worden gemaakt.">
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8a5 5 0 1 0 1-3"/><path d="M3 3v3h3"/></svg>
                 Alles resetten
               </button>
-              <button className="bm-cal-btn" onClick={() => setConfirmClearLog(true)}>
+              <button className="bm-cal-btn" onClick={() => setConfirmClearLog(true)}
+                title="Wist het logboek van vandaag uit de live weergave. Het archief in het kalender-logboek blijft bewaard.">
                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5h10m-8 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1m-7 0 1 8h6l1-8"/></svg>
                 Logboek wissen
+              </button>
+              <button className="bm-cal-btn" onClick={() => exportDayLogs(new Date().toISOString().slice(0,10), teams, notify)}
+                title="Exporteer het logboek van vandaag direct als .csv — handig voor noodgevallen vóór het wissen.">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v8m-4-3 4 4 4-4"/><path d="M3 14h10"/></svg>
+                Export log
               </button>
             </>
           )}

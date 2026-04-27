@@ -45,7 +45,7 @@
         --brand:         #d82335;
         --brand-deep:    #b0001f;
         --brand-tint:    rgba(255,191,48,0.24);
-        --sage:          #4ade80;
+        --sage:          #22c55e;
         --amber:         #fbbf24;
         --danger:        #d82335;
 
@@ -832,8 +832,8 @@
         padding: 2px 9px; border-radius: 99px; color: var(--ink-3);
         white-space: nowrap; text-align: center; display: inline-block;
       }
-      .bm-admin-tag-early { background: rgba(84,122,61,0.18); color: var(--sage); }
-      .bm-admin-tag-timer { background: var(--border); color: var(--ink-3); }
+      .bm-admin-tag-early { background: #16a34a; color: #fff; font-weight: 600; }
+      .bm-admin-tag-timer { background: var(--bg-2); color: var(--ink-2); border: 1px solid var(--border-strong); }
       .bm-admin-tag-leader-ended {
         background: #fff; color: #b93a39;
         border: 1.5px solid #b93a39; font-weight: 700; border-radius: 99px;
@@ -939,7 +939,7 @@
         font-size: 11px; font-weight: 500; padding: 2px 8px;
         border-radius: 99px; letter-spacing: 0.03em; white-space: nowrap;
       }
-      .bm-user-dot-active { background: rgba(22,163,74,0.12); color: var(--sage); }
+      .bm-user-dot-active { background: #16a34a; color: #fff; }
       .bm-user-dot-break  { background: rgba(220,38,38,0.12); color: var(--danger); }
       .bm-user-dot-queue  { background: rgba(217,119,6,0.12); color: var(--brand); }
       .bm-user-breaks { font-family: 'Inter'; font-size: 11px; font-weight: 500; color: var(--ink-2); }
