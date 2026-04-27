@@ -883,7 +883,7 @@
       .bm-dark .bm-admin-type-brb { background: transparent; color: #e8364a; border-color: #e8364a; }
       .bm-dark .bm-admin-type-short { background: linear-gradient(to right, #c01e2e 50%, #2b2b2b 50%); border-color: #e8364a; color: transparent; }
       .bm-dark .bm-admin-type-short::before { color: #ffffff; }
-      .bm-dark .bm-admin-type-short::after { color: #e05555; }
+      .bm-dark .bm-admin-type-short::after { color: #2b2b2b; }
       .bm-dark .bm-admin-type-lunch { background: #c01e2e; border-color: #c01e2e; }
       .bm-admin-log-text { font-size: 12px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
       .bm-admin-time-cell { font-family: 'Inter'; font-size: 11px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
@@ -1002,7 +1002,7 @@
         border-radius: 99px; letter-spacing: 0.03em; white-space: nowrap;
       }
       .bm-user-dot-active { background: #16a34a; color: #fff; }
-      .bm-user-dot-break  { background: rgba(220,38,38,0.12); color: var(--danger); }
+      .bm-user-dot-break  { background: var(--brand); color: #fff; }
       .bm-user-dot-queue  { background: rgba(217,119,6,0.12); color: var(--brand); }
       .bm-user-breaks { font-family: 'Inter'; font-size: 11px; font-weight: 500; color: var(--ink-2); }
       .bm-user-time { font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--ink-2); }

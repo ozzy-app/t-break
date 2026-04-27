@@ -1,7 +1,15 @@
+const IconCrown = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.9}}>
+    <path d="M2 20h20M4 20 2 8l5 4 5-8 5 8 5-4-2 12H4z"/>
+  </svg>
+);
+
 import { TYPES } from '../lib/constants';
 import { fmt } from '../lib/helpers';
 
 export function ActiveTicket({ myBreak, config, onEnd }) {
+  const isAdminGrant = !!myBreak.adminGranted;
   const dur = config[TYPES[myBreak.type].durKey];
   const endAt = myBreak.startedAt + dur * 1000;
   const now = Date.now();
@@ -24,7 +32,7 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
           /* SHORT landscape — left side red, right stub white */
           <>
             <div className="t-body-l t-body-l-top">
-              <div className="t-brand-l t-brand-l-inv">T-BREAK</div>
+              <div className="t-brand-l t-brand-l-inv" style={{display:'flex',alignItems:'center',gap:6}}>{isAdminGrant && <IconCrown />}T-BREAK</div>
               <svg className="t-logo t-logo-l" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
               <rect x="0.5" y="0.5" width="31" height="31" fill="none" stroke="white" strokeWidth="2.5" rx="1"/>
               <rect x="5" y="5" width="22" height="22" fill="white"/>
@@ -50,7 +58,7 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
           /* BRB and LUNCH — unified solid/outline landscape */
           <>
             <div className="t-body-l">
-              <div className="t-brand-l">T-BREAK</div>
+              <div className="t-brand-l" style={{display:'flex',alignItems:'center',gap:6}}>{isAdminGrant && <IconCrown />}T-BREAK</div>
               {type === 'brb' ? (
                 <svg className="t-logo t-logo-l" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                   <rect x="0.5" y="0.5" width="31" height="31" fill="none" stroke="currentColor" strokeWidth="2.5" rx="1"/>
