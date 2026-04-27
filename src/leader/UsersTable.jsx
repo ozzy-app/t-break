@@ -5,6 +5,14 @@ import { useTeams, getTeamIds, getTeamLabel, getTeamColor, getTeamTextColor } fr
 import { fmtMs } from '../lib/helpers';
 import { exportUserLogs } from '../lib/export';
 
+const IconCrown = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 20h20M4 20 2 8l5 4 5-8 5 8 5-4-2 12H4z"/>
+  </svg>
+);
+
+
 // Is this user currently overrun, or did they have an overrun break today?
 function getUserOvertimeTeam(state, uid) {
   // Check historical overrun flag (set when a user ends a break late)
@@ -272,7 +280,7 @@ export function UsersTable({ state, me, onGrantExtraBreak, onRemoveExtraBreak, o
             return (
               <div key={u.uid} className={`bm-user-row ${u.isOnBreak ? 'bm-user-on-break' : ''}`} style={{ gridTemplateColumns: cols }}>
                 <span className="bm-user-name">
-                  {u.isLeader && <span className="bm-user-crown" title="Leider">♛</span>}
+                  {u.isLeader && <span className="bm-user-crown" title="Admin"><IconCrown /></span>}
                   {u.name}
                   {u.uid === me.userId && <span className="bm-user-badge-you">jij</span>}
                 </span>
