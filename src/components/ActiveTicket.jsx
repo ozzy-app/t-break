@@ -10,31 +10,57 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
   const pct = Math.max(0, Math.min(100, ((dur - remaining) / dur) * 100));
   const over = now >= endAt;
   const def = TYPES[myBreak.type];
+  const type = myBreak.type;
 
   return (
     <section className="t-active-wrap" style={{ touchAction: 'manipulation' }}>
       <div
-        className={`t-ticket t-landscape t-col-${myBreak.type} ${over ? 't-ticket-over' : ''}`}
+        className={`t-ticket t-landscape t-landscape-active t-col-${type} ${over ? 't-ticket-over' : ''}`}
         onClick={(e) => { e.stopPropagation(); onEnd(); }}
         style={{ cursor: 'pointer' }}
         title="Klik om pauze te beëindigen"
       >
-        <div className="t-body-l">
-          <div className="t-brand-l">T-BREAK</div>
-          <div className="t-type-l">{def.useDash ? `— ${def.ticketLabel}` : def.ticketLabel}</div>
-          <div className="t-status-l">{over ? 'OVERSCHREDEN' : 'BEZIG'}</div>
-        </div>
-        <div className="t-perf-v">
-          <span className="t-hole t-hole-t" />
-          <span className="t-hole t-hole-b" />
-        </div>
-        <div className="t-stub-l">
-          <div className="t-stub-l-top">{over ? 'OVERTIJD' : 'ACTIEF'}</div>
-          <div className="t-stub-l-name">{myBreak.userName}</div>
-          <div className="t-stub-l-bar">
-            <div className="t-stub-l-bar-fill" style={{ width: `${over ? 100 : pct}%` }} />
-          </div>
-        </div>
+        {type === 'short' ? (
+          /* SHORT landscape — left side red, right stub white */
+          <>
+            <div className="t-body-l t-body-l-top">
+              <div className="t-brand-l t-brand-l-inv">T-BREAK</div>
+              <div className="t-type-l t-type-l-inv">{def.ticketLabel}</div>
+              <div className="t-status-l t-status-l-inv">{over ? 'OVERSCHREDEN' : 'BEZIG'}</div>
+            </div>
+            <div className="t-perf-v">
+              <span className="t-hole t-hole-t" />
+              <span className="t-hole t-hole-b" />
+            </div>
+            <div className="t-stub-l t-stub-l-light">
+              <div className="t-stub-l-top t-stub-l-top-dark">{over ? 'OVERTIJD' : 'ACTIEF'}</div>
+              <div className="t-stub-l-name t-stub-l-name-dark">{myBreak.userName}</div>
+              <div className="t-stub-l-bar t-stub-l-bar-dark">
+                <div className="t-stub-l-bar-fill" style={{ width: `${over ? 100 : pct}%` }} />
+              </div>
+            </div>
+          </>
+        ) : (
+          /* BRB and LUNCH — unified solid/outline landscape */
+          <>
+            <div className="t-body-l">
+              <div className="t-brand-l">T-BREAK</div>
+              <div className="t-type-l">{def.useDash ? `— ${def.ticketLabel}` : def.ticketLabel}</div>
+              <div className="t-status-l">{over ? 'OVERSCHREDEN' : 'BEZIG'}</div>
+            </div>
+            <div className="t-perf-v">
+              <span className="t-hole t-hole-t" />
+              <span className="t-hole t-hole-b" />
+            </div>
+            <div className="t-stub-l">
+              <div className="t-stub-l-top">{over ? 'OVERTIJD' : 'ACTIEF'}</div>
+              <div className="t-stub-l-name">{myBreak.userName}</div>
+              <div className="t-stub-l-bar">
+                <div className="t-stub-l-bar-fill" style={{ width: `${over ? 100 : pct}%` }} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
       <div className={`t-timer ${over ? 't-timer-over' : ''}`}>
         <div className="t-timer-val">
