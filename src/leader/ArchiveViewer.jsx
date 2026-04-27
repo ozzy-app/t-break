@@ -89,7 +89,7 @@ function BreakRow({ e, gridTemplate }) {
         short: 'heeft korte pauze genomen',
         lunch: 'heeft lunchpauze genomen',
       }[e.type] || ''}</span>
-      <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label || '–'}</span>
+      <span className={`bm-admin-type bm-admin-type-${e.type}`} data-label={TYPES[e.type]?.label || ''}>{TYPES[e.type]?.label || '–'}</span>
       <span>
         {isLate
           ? <span className="bm-admin-late-pill">LAAT</span>

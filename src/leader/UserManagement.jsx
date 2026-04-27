@@ -309,7 +309,7 @@ function ActivityLog({ logs }) {
                         {e.started_at ? new Date(e.started_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : ''}
                       </span>
                     </span>
-                    <span className={`bm-admin-type bm-admin-type-${e.break_type}`}>
+                    <span className={`bm-admin-type bm-admin-type-${e.break_type}`} data-label={TYPES[e.break_type]?.label || ''}>
                       {TYPES[e.break_type]?.label || '–'}
                     </span>
                     <span>

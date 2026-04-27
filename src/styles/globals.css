@@ -821,9 +821,42 @@
         font-weight: 700; padding: 2px 9px; border-radius: 99px;
         white-space: nowrap; width: fit-content;
       }
-      .bm-admin-type-brb { background: rgba(216,35,53,0.10); color: #d82335; }
-      .bm-admin-type-short { background: rgba(220,38,38,0.10); color: var(--danger); }
-      .bm-admin-type-lunch { background: rgba(220,38,38,0.10); color: var(--danger); }
+      /* BRB — white pill, red outline + text */
+      .bm-admin-type-brb {
+        background: #ffffff;
+        color: #d82335;
+        border: 1.5px solid #d82335;
+        box-shadow: none;
+      }
+      /* SHORT — split: left red, right white; use gradient + layered text */
+      .bm-admin-type-short {
+        background: linear-gradient(to right, #d82335 50%, #ffffff 50%);
+        color: #d82335;
+        border: 1.5px solid #d82335;
+        /* Text needs to be readable on both halves — use outline trick via text-shadow */
+        text-shadow: 0 0 0 transparent;
+        position: relative; overflow: hidden;
+      }
+      /* Pseudo overlay for the left-half text in white */
+      .bm-admin-type-short::before {
+        content: attr(data-label);
+        position: absolute; left: 0; top: 0; bottom: 0; width: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: #ffffff;
+        font-size: inherit; font-weight: inherit; letter-spacing: inherit; text-transform: inherit;
+        padding-left: 9px;
+        pointer-events: none;
+      }
+      /* LUNCH — full red, white text */
+      .bm-admin-type-lunch {
+        background: #d82335;
+        color: #ffffff;
+        border: 1.5px solid #d82335;
+      }
+      /* Dark mode adjustments */
+      .bm-dark .bm-admin-type-brb { background: transparent; color: #e8364a; border-color: #e8364a; }
+      .bm-dark .bm-admin-type-short { background: linear-gradient(to right, #c01e2e 50%, transparent 50%); border-color: #e8364a; color: #e8364a; }
+      .bm-dark .bm-admin-type-lunch { background: #c01e2e; border-color: #c01e2e; }
       .bm-admin-log-text { font-size: 12px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
       .bm-admin-time-cell { font-family: 'Inter'; font-size: 11px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
       .bm-admin-time { font-family: 'Inter'; font-size: 11px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
