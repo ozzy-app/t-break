@@ -307,7 +307,7 @@ function ActivityLog({ logs }) {
   );
 }
 
-export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGrantExtraBreak, onRemoveExtraBreak, onBack, notify, useNamingConvention = true, onToggleNamingConvention }) {
+export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGrantExtraBreak, onRemoveExtraBreak, onStartBreak, onBack, notify, useNamingConvention = true, onToggleNamingConvention }) {
   const teams = useTeams();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -621,6 +621,7 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                         )}
 
                         {u.team && (
+                          <>
                           <div className="bm-um-actions-row">
                             <span className="bm-um-action-label">Pauzes:</span>
                             <span className="bm-um-usage">
@@ -640,6 +641,24 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                               </button>
                             </>}
                           </div>
+                          {onStartBreak && !u.isOnBreak && (
+                            <div className="bm-um-actions-row">
+                              <span className="bm-um-action-label">Geef pauze:</span>
+                              <button className="bm-btn bm-btn-primary bm-btn-sm bm-um-give-brb"
+                                onClick={() => onStartBreak(u.team, u.id, u.name, 'brb')}>
+                                Geef BRB
+                              </button>
+                              <button className="bm-btn bm-btn-primary bm-btn-sm"
+                                onClick={() => onStartBreak(u.team, u.id, u.name, 'short')}>
+                                Geef Short
+                              </button>
+                              <button className="bm-btn bm-btn-primary bm-btn-sm"
+                                onClick={() => onStartBreak(u.team, u.id, u.name, 'lunch')}>
+                                Geef Lunch
+                              </button>
+                            </div>
+                          )}
+                          </>
                         )}
                       </div>
 

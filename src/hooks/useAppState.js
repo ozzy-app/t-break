@@ -284,7 +284,7 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
         return s;
       }
       const { dailyKey, dailyLimKey } = TYPES[type];
-      if (dailyKey && dailyLimKey) {
+      if (dailyKey && dailyLimKey && !entry.adminGranted) {
         const usage = t.usage[me.userId] || { date: todayStr(), short: 0, lunch: 0 };
         const extra = type === 'short' ? t.extraBreaks[me.userId] || 0 : 0;
         if (usage[dailyKey] >= t.config[dailyLimKey] + extra) {

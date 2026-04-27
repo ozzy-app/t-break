@@ -28,7 +28,9 @@ export function TicketRow({
   const dailyUsed = def.dailyKey ? myUsage[def.dailyKey] || 0 : null;
   const extraAllowance = type === 'short' ? myExtraBreaks || 0 : 0;
   const effectiveDailyLim = dailyLim != null ? dailyLim + extraAllowance : null;
-  const limitReached = effectiveDailyLim != null && dailyUsed >= effectiveDailyLim;
+  const myQueueEntry = queue.find(q => q.userId === me?.userId);
+  const adminGranted = !!(myQueueEntry?.adminGranted);
+  const limitReached = effectiveDailyLim != null && dailyUsed >= effectiveDailyLim && !adminGranted;
 
   const iAmOnAnyBreak = !!myActive;
   const iAmQueuedHere = myQueueType === type;
@@ -92,10 +94,10 @@ export function TicketRow({
     <section className="t-row">
       <div className="t-row-head">
         <div>
-          <h2 className="t-row-title">{def.full}</h2>
           <div className="t-row-kicker">
             {Math.round(state.config[def.durKey] / 60)} MIN · {def.tagline.toUpperCase()}
           </div>
+          <h2 className="t-row-title">{def.full}</h2>
         </div>
         <div className="t-row-meta">
           {dailyLim != null && (

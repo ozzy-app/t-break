@@ -481,17 +481,17 @@
       .bm-queue-banner {
         display: flex; align-items: center; justify-content: space-between;
         padding: 20px 28px; border-radius: 16px; gap: 20px;
-        background: #fff;
-        color: #d82335;
-        box-shadow: 0 8px 24px rgba(216,35,53,0.18);
-        border: 2px solid #d82335;
+        background: #d82335;
+        color: #ffffff;
+        box-shadow: 0 8px 24px rgba(216,35,53,0.28);
+        border: 2px solid rgba(255,255,255,0.3);
         margin: 0;
       }
       .bm-dark .bm-queue-banner {
-        background: #2b2b2b;
-        color: #e8364a;
-        border-color: #e8364a;
-        box-shadow: 0 8px 24px rgba(216,35,53,0.18);
+        background: #d82335;
+        color: #ffffff;
+        border-color: rgba(255,255,255,0.3);
+        box-shadow: 0 8px 24px rgba(216,35,53,0.28);
       }
       .bm-queue-banner-left { display: flex; flex-direction: column; gap: 4px; }
       .bm-queue-banner-label {
@@ -505,17 +505,17 @@
       .bm-queue-banner-pos {
         font-size: 13px; opacity: 0.8; margin-top: 2px;
       }
-      /* Number badge — orange background, white text */
+      /* Number badge — white bg, red text (inverted since banner is red) */
       .bm-queue-banner-pill {
         font-family: 'Inter'; font-size: 40px; font-weight: 900; letter-spacing: -0.02em;
         line-height: 1; padding: 8px 20px; border-radius: 12px;
         min-width: 90px; text-align: center;
-        background: #d82335; color: #fff;
+        background: #ffffff; color: #d82335;
       }
-      .bm-dark .bm-queue-banner-pill { background: #e8364a; color: #fff; }
+      .bm-dark .bm-queue-banner-pill { background: #ffffff; color: #d82335; }
       .bm-queue-banner-pill-brb,
       .bm-queue-banner-pill-short,
-      .bm-queue-banner-pill-lunch { background: #d82335; color: #fff; }
+      .bm-queue-banner-pill-lunch { background: #ffffff; color: #d82335; }
 
       .t-active-wrap, .t-offer-wrap {
         display: flex; flex-direction: column; align-items: center;
@@ -1596,6 +1596,9 @@
       .bm-te-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
       .bm-te-label { font-weight: 600; font-size: 14px; flex: 1; }
       .bm-te-members { font-size: 11px; color: var(--sage); white-space: nowrap; }
+      /* Grant break buttons in user card */
+      .bm-um-give-brb { background: var(--brand) !important; }
+
       .bm-te-edit-btn {
         background: var(--brand); color: #fff; border: none; border-radius: 6px;
         width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
