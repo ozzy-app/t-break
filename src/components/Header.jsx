@@ -1,113 +1,159 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { sb } from '../lib/supabase';
-import { getTeamIds, getTeamLabel } from '../lib/TeamsContext';
-import { useDarkMode } from '../hooks/useDarkMode';
+import { useTeams, getTeamIds, getTeamLabel, getTeamColor, getTeamTextColor } from '../lib/TeamsContext';
 
+function useDarkMode() {
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem('bm:dark') === '1'; } catch { return false; }
+  });
+  useEffect(() => {
+    document.documentElement.classList.toggle('bm-dark', dark);
+    try { localStorage.setItem('bm:dark', dark ? '1' : '0'); } catch {}
+  }, [dark]);
+  return [dark, setDark];
+}
+
+// ── SVG icons in brand red ──────────────────────────────────────
+const IconCrown = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 20h20"/>
+    <path d="m3 9 4 4 5-8 5 8 4-4 1 11H2L3 9z"/>
+  </svg>
+);
+
+const IconEmployee = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4"/>
+    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+  </svg>
+);
+
+const IconAdmin = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
+);
+
+const IconKey = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="7.5" cy="15.5" r="5.5"/>
+    <path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>
+  </svg>
+);
+
+// ── Change password modal ───────────────────────────────────────
 function ChangePasswordModal({ onClose, notify }) {
   const [pw, setPw] = useState('');
   const [pw2, setPw2] = useState('');
-  const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const save = async () => {
-    if (pw.length < 8) { notify?.('Minimaal 8 tekens', 'warn'); return; }
-    if (pw !== pw2) { notify?.('Wachtwoorden komen niet overeen', 'warn'); return; }
+  const submit = async () => {
+    if (pw.length < 8) { notify('Minimaal 8 tekens', 'warn'); return; }
+    if (pw !== pw2) { notify('Wachtwoorden komen niet overeen', 'warn'); return; }
     setBusy(true);
     const { error } = await sb.auth.updateUser({ password: pw });
     setBusy(false);
-    if (error) { notify?.('Fout: ' + error.message, 'warn'); }
-    else { notify?.('Wachtwoord gewijzigd', 'ok'); onClose(); }
+    if (error) { notify('Fout: ' + error.message, 'warn'); return; }
+    notify('Wachtwoord gewijzigd', 'ok');
+    onClose();
   };
 
   return (
     <div className="bm-modal-backdrop" onClick={onClose}>
       <div className="bm-modal-popup" onClick={e => e.stopPropagation()} style={{ maxWidth: 360 }}>
         <div className="bm-modal-header">
-          <div><div className="bm-modal-title">Wachtwoord wijzigen</div></div>
+          <div className="bm-modal-title">Wachtwoord wijzigen</div>
           <button className="bm-modal-close" onClick={onClose}>✕</button>
         </div>
-        <div className="bm-modal-section-label">Nieuw wachtwoord</div>
-        <div className="bm-modal-row" style={{ gap: 6 }}>
-          <input className="bm-input" style={{ flex: 1 }} placeholder="Min. 8 tekens"
-            type={showPw ? 'text' : 'password'} value={pw}
-            onChange={e => setPw(e.target.value)} autoFocus />
-          <button className="bm-btn bm-btn-ghost bm-btn-sm" onClick={() => setShowPw(v => !v)}>
-            {showPw ? '🙈' : '👁'}
-          </button>
-        </div>
-        <div className="bm-modal-section-label">Bevestig wachtwoord</div>
-        <div className="bm-modal-row">
-          <input className="bm-input bm-modal-select" placeholder="Herhaal wachtwoord"
-            type={showPw ? 'text' : 'password'} value={pw2}
-            onChange={e => setPw2(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && save()} />
-        </div>
-        <div className="bm-modal-row" style={{ paddingTop: 4, paddingBottom: 20, gap: 8 }}>
-          <button className="bm-btn bm-btn-primary" onClick={save} disabled={busy || pw.length < 8}>
+        <div style={{ padding: '16px 20px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <input className="bm-input" type="password" placeholder="Nieuw wachtwoord"
+            value={pw} onChange={e => setPw(e.target.value)} autoFocus />
+          <input className="bm-input" type="password" placeholder="Bevestig wachtwoord"
+            value={pw2} onChange={e => setPw2(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && submit()} />
+          <button className="bm-btn bm-btn-primary" onClick={submit} disabled={busy}>
             {busy ? 'Opslaan…' : 'Opslaan'}
           </button>
-          <button className="bm-btn bm-btn-ghost" onClick={onClose}>Annuleren</button>
         </div>
       </div>
     </div>
   );
 }
 
-export function Header({ me, onSignOut, onToggleLeader, myTeam, onRequestTeamSwitch, isEmployeeView, notify, teams = [] }) {
+// ── Header ──────────────────────────────────────────────────────
+export function Header({ me, onSignOut, onToggleLeader, isEmployeeView, notify, myTeam, onRequestTeamSwitch }) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useDarkMode();
   const [showChangePw, setShowChangePw] = useState(false);
+  const teams = useTeams();
+  const teamIds = getTeamIds(teams);
 
   return (
     <header className="bm-header">
+      {/* Brand */}
       <div className="bm-brand">
         <span className="bm-brand-mark">▣</span>
         <span className="bm-brand-name">T-BREAK</span>
       </div>
 
-      {/* Employee team switcher */}
-      {(!me.isLeader || isEmployeeView) && (
-        <div className="bm-header-team-switcher">
-          {getTeamIds(teams).map(team => {
-            const isCurrent = myTeam === team;
-            return (
-              <button key={team}
-                className={`bm-header-team-pill ${isCurrent ? 'bm-header-team-pill-active' : ''}`}
-                onClick={() => !isCurrent && onRequestTeamSwitch(team)}
-                disabled={isCurrent}
-                title={isCurrent ? `Huidig team: ${getTeamLabel(teams, team)}` : `Wissel naar ${getTeamLabel(teams, team)}`}
-              >
-                {getTeamLabel(teams, team)}
-              </button>
-            );
-          })}
+      {/* Team pills — center */}
+      {teamIds.length > 0 && (
+        <div className="bm-header-teams">
+          {teamIds.map((t) => (
+            <button
+              key={t}
+              className={`bm-header-team-pill ${myTeam === t ? 'bm-header-team-pill-active' : ''}`}
+              style={myTeam === t
+                ? { background: getTeamColor(teams, t), color: getTeamTextColor(teams, t) }
+                : {}}
+              onClick={() => myTeam !== t && onRequestTeamSwitch?.(t)}
+            >
+              {getTeamLabel(teams, t)}
+            </button>
+          ))}
         </div>
       )}
 
-      <div className="bm-header-right bm-header-actions">
+      {/* Right side */}
+      <div className="bm-header-right">
         <button className="bm-dark-toggle" onClick={() => setDark(d => !d)}
-          title={dark ? 'Lichte modus' : 'Donkere modus'} aria-label="Schakel donkere modus">
+          title={dark ? 'Lichte modus' : 'Donkere modus'} aria-label="Donkere modus">
           {dark ? '☀' : '☾'}
         </button>
+
+        {/* Chip — crown ALWAYS visible for admins, even in employee view */}
         <button className="bm-chip" onClick={() => setOpen(v => !v)}>
-          {me.isLeader && !isEmployeeView && <span className="bm-chip-crown">♛</span>}
+          {me.isLeader && (
+            <span className="bm-chip-crown">
+              <IconCrown />
+            </span>
+          )}
           <span>{me.name}</span>
         </button>
+
         {open && (
           <div className="bm-menu" onMouseLeave={() => setOpen(false)}>
             {me.isLeader && !isEmployeeView && (
               <button className="bm-menu-item" onClick={() => { onToggleLeader(); setOpen(false); }}>
-                👤 Medewerkerweergave
+                <span className="bm-menu-icon"><IconEmployee /></span>
+                Medewerkerweergave
               </button>
             )}
             {me.isLeader && isEmployeeView && (
               <button className="bm-menu-item" onClick={() => { onToggleLeader(); setOpen(false); }}>
-                ♛ Admin weergave
+                <span className="bm-menu-icon"><IconAdmin /></span>
+                Admin weergave
               </button>
             )}
             <button className="bm-menu-item" onClick={() => { setShowChangePw(true); setOpen(false); }}>
-              🔑 Wachtwoord wijzigen
+              <span className="bm-menu-icon"><IconKey /></span>
+              Wachtwoord wijzigen
             </button>
+            <div className="bm-menu-divider" />
             <button className="bm-menu-item" onClick={() => { onSignOut(); setOpen(false); }}>
               Uitloggen
             </button>
