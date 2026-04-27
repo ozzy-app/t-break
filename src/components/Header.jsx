@@ -14,6 +14,29 @@ function useDarkMode() {
 }
 
 // ── SVG icons in brand red ──────────────────────────────────────
+const IconSun = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+  </svg>
+);
+
+const IconMoon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
+
+const IconDoor = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M13 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/>
+    <path d="M16 8l4 4-4 4M20 12H9"/>
+  </svg>
+);
+
 const IconCrown = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +154,7 @@ export function Header({ me, onSignOut, onToggleLeader, isEmployeeView, notify, 
       <div className="bm-header-right">
         <button className="bm-dark-toggle" onClick={() => setDark(d => !d)}
           title={dark ? 'Lichte modus' : 'Donkere modus'} aria-label="Donkere modus">
-          {dark ? '☀' : '☾'}
+          {dark ? <IconSun /> : <IconMoon />}
         </button>
 
         {/* Chip — crown ALWAYS visible for admins, even in employee view */}
@@ -164,6 +187,7 @@ export function Header({ me, onSignOut, onToggleLeader, isEmployeeView, notify, 
             </button>
             <div className="bm-menu-divider" />
             <button className="bm-menu-item" onClick={() => { onSignOut(); setOpen(false); }}>
+              <span className="bm-menu-icon"><IconDoor /></span>
               Uitloggen
             </button>
           </div>
