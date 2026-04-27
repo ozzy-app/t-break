@@ -265,3 +265,6 @@ export function TeamEditor({ state, onClose, notify }) {
     </div>
   );
 }
+
+// Alias for backwards compatibility with LeaderPanel import
+export { TeamEditor as TeamEditorModal };
