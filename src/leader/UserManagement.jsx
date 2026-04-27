@@ -644,16 +644,16 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                           {onStartBreak && !u.isOnBreak && (
                             <div className="bm-um-actions-row">
                               <span className="bm-um-action-label">Geef pauze:</span>
-                              <button className="bm-btn bm-btn-primary bm-btn-sm bm-um-give-brb"
-                                onClick={() => onStartBreak(u.team, u.id, u.name, 'brb')}>
+                              <button className="bm-btn bm-btn-primary bm-btn-sm" style={{ background: "#d82335" }}
+                                onClick={() => onStartBreak(u.id, u.name, u.team, 'brb')}>
                                 Geef BRB
                               </button>
                               <button className="bm-btn bm-btn-primary bm-btn-sm"
-                                onClick={() => onStartBreak(u.team, u.id, u.name, 'short')}>
+                                onClick={() => onStartBreak(u.id, u.name, u.team, 'short')}>
                                 Geef Short
                               </button>
                               <button className="bm-btn bm-btn-primary bm-btn-sm"
-                                onClick={() => onStartBreak(u.team, u.id, u.name, 'lunch')}>
+                                onClick={() => onStartBreak(u.id, u.name, u.team, 'lunch')}>
                                 Geef Lunch
                               </button>
                             </div>

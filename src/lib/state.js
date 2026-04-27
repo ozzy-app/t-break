@@ -10,7 +10,6 @@ export function blankTeam(cfg) {
     queues: { brb: [], short: [], lunch: [] },
     usage: {},
     extraBreaks: {},
-    adminGranted: {},   // userId -> Set of types granted by admin this day (bypass daily limit)
   };
 }
 
@@ -47,7 +46,6 @@ export async function loadShared() {
     const rawQueues = data.queues || {};
     const rawUsage = data.usage || {};
     const rawExtra = data.extra_breaks || {};
-    const rawAdminGranted = data.admin_granted || {};
     // Use ALL team IDs found in saved data, not just hardcoded DEFAULT_TEAMS
     const allTeams = new Set([
       ...DEFAULT_TEAMS,
@@ -62,7 +60,6 @@ export async function loadShared() {
         queues: { brb: [], short: [], lunch: [], ...(rawQueues[team] || {}) },
         usage: rawUsage[team] || {},
         extraBreaks: rawExtra[team] || {},
-        adminGranted: rawAdminGranted[team] || {},
       };
     }
     return state;
@@ -74,7 +71,7 @@ export async function loadShared() {
 
 export async function saveShared(s) {
   try {
-    const config = {}, activeBreaks = {}, queues = {}, usage = {}, extraBreaks = {}, adminGranted = {};
+    const config = {}, activeBreaks = {}, queues = {}, usage = {}, extraBreaks = {};
     // Save ALL teams in state, not just hardcoded DEFAULT_TEAMS
     for (const team of Object.keys(s.teams)) {
       const t = s.teams[team];
@@ -84,7 +81,6 @@ export async function saveShared(s) {
       queues[team] = t.queues;
       usage[team] = t.usage;
       extraBreaks[team] = t.extraBreaks;
-      adminGranted[team] = t.adminGranted || {};
     }
     await sb.from('app_state').upsert(
       {
@@ -96,7 +92,6 @@ export async function saveShared(s) {
         sessions: s.sessions || {},
         total_time: s.totalTime || {},
         extra_breaks: extraBreaks,
-        admin_granted: adminGranted,
         default_config: s.defaultConfigs || {},
         log: (s.log || []).slice(0, 100),
         last_date: s._lastDate || todayStr(),
@@ -252,7 +247,6 @@ export function cleanup(state) {
     }
     if (!t.extraBreaks) t.extraBreaks = {};
     if (!t.usage) t.usage = {};
-    if (!t.adminGranted) t.adminGranted = {};
 
     // Stale usage reset
     for (const u of Object.keys(t.usage)) {
@@ -311,22 +305,4 @@ export async function saveGlobalSettings(patch) {
     const current = data?.global_settings || {};
     await sb.from('app_state').update({ global_settings: { ...current, ...patch } }).eq('id', 1);
   } catch (e) { console.error('saveGlobalSettings error', e); }
-}
-
-// Mark that an admin granted a break of `type` for `userId` — bypasses daily limit once
-export function markAdminGrant(state, team, userId, type) {
-  const s = JSON.parse(JSON.stringify(state));
-  if (!s.teams[team]) return s;
-  if (!s.teams[team].adminGranted) s.teams[team].adminGranted = {};
-  if (!s.teams[team].adminGranted[userId]) s.teams[team].adminGranted[userId] = [];
-  if (!s.teams[team].adminGranted[userId].includes(type)) {
-    s.teams[team].adminGranted[userId].push(type);
-  }
-  return s;
-}
-
-// Check and consume an admin grant (returns true if bypass applies, removes the grant)
-export function consumeAdminGrant(state, team, userId, type) {
-  const grants = state.teams?.[team]?.adminGranted?.[userId] || [];
-  return grants.includes(type);
 }
