@@ -55,7 +55,7 @@ async function buildRows(data, teams = []) {
     : '';
 
   return data
-    .filter(r => r.kind !== 'admin' && r.break_type)
+    .filter(r => r.break_type && ['brb','short','lunch'].includes(r.break_type))
     .map(r => {
       const durMs   = r.duration_ms || (r.ended_at && r.started_at
         ? new Date(r.ended_at) - new Date(r.started_at)
@@ -95,10 +95,10 @@ async function buildRows(data, teams = []) {
         logtekst,                                                  // Logtekst
         (r.break_type || '').toUpperCase(),                        // Type
         eindstatus,                                                // Eindstatus
+        pauzeMin,                                                  // Pauze Tijd (H:MM:SS)
         isLate ? msToHmmss(overMs) : '',                           // Overtijd (H:MM:SS)
         fmtTime(r.started_at),                                    // Start
         fmtTime(r.ended_at),                                      // Einde
-        pauzeMin,                                                  // Pauze Tijd (min) — numeric
         fmtDt(logTs),                                             // Log Tijd
       ];
     });
