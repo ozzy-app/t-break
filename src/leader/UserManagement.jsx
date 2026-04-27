@@ -7,12 +7,11 @@ import { fmtMs } from '../lib/helpers';
 import { adminApi } from '../lib/adminApi';
 import { sb } from '../lib/supabase';
 
-// SVG crown — matches Header.jsx
+// SVG Crown — consistent with Header.jsx
 const IconCrown = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 20h20"/>
-    <path d="m3 9 4 4 5-8 5 8 4-4 1 11H2L3 9z"/>
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 20h20M4 20 2 8l5 4 5-8 5 8 5-4-2 12H4z"/>
   </svg>
 );
 
@@ -317,7 +316,7 @@ function ActivityLog({ logs }) {
   );
 }
 
-export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGrantExtraBreak, onRemoveExtraBreak, onStartBreak, onBack, notify, useNamingConvention = true, onToggleNamingConvention }) {
+export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGrantExtraBreak, onRemoveExtraBreak, onBack, notify, useNamingConvention = true, onToggleNamingConvention }) {
   const teams = useTeams();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -631,7 +630,6 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                         )}
 
                         {u.team && (
-                          <>
                           <div className="bm-um-actions-row">
                             <span className="bm-um-action-label">Pauzes:</span>
                             <span className="bm-um-usage">
@@ -651,24 +649,6 @@ export function UserManagement({ state, me, onAssignLeader, onAssignTeam, onGran
                               </button>
                             </>}
                           </div>
-                          {onStartBreak && !u.isOnBreak && (
-                            <div className="bm-um-actions-row">
-                              <span className="bm-um-action-label">Geef pauze:</span>
-                              <button className="bm-btn bm-btn-primary bm-btn-sm" style={{ background: "#d82335" }}
-                                onClick={() => onStartBreak(u.id, u.name, u.team, 'brb')}>
-                                Geef BRB
-                              </button>
-                              <button className="bm-btn bm-btn-primary bm-btn-sm"
-                                onClick={() => onStartBreak(u.id, u.name, u.team, 'short')}>
-                                Geef Short
-                              </button>
-                              <button className="bm-btn bm-btn-primary bm-btn-sm"
-                                onClick={() => onStartBreak(u.id, u.name, u.team, 'lunch')}>
-                                Geef Lunch
-                              </button>
-                            </div>
-                          )}
-                          </>
                         )}
                       </div>
 

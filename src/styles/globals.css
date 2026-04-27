@@ -182,8 +182,8 @@
         border-radius: 10px; overflow: hidden; min-width: 220px;
         box-shadow: 0 12px 28px rgba(0,0,0,0.12); z-index: 20;
       }
-      .bm-menu-icon { display: flex; align-items: center; color: var(--brand); flex-shrink: 0; }
-      .bm-menu-icon svg { width: 16px; height: 16px; }
+      .bm-menu-icon { display: flex; align-items: center; justify-content: center; color: var(--brand); flex-shrink: 0; width: 20px; }
+      .bm-menu-icon svg { width: 17px; height: 17px; }
       .bm-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
       .bm-menu-item {
         width: 100%; text-align: left; padding: 11px 16px;
@@ -740,7 +740,7 @@
         display: flex; align-items: center; position: relative;
         overflow: hidden; white-space: nowrap; min-width: 0;
       }
-      .bm-log-header-label { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
       /* Resize handle sits at the right edge of its cell, centered on the grid line */
       .bm-col-resize-handle {
         position: absolute; right: -4px; top: 0; bottom: 0;
@@ -755,6 +755,9 @@
         transition: background 0.15s, height 0.15s;
       }
       .bm-col-resize-handle:hover::after { background: var(--brand); height: 18px; }
+      .bm-col-resize-handle-right { right: 0; }
+      .bm-col-resize-handle-left  { left: 0; }
+      .bm-log-header-label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
 
       /* ── Resizable log column header ───────────────────────────── */
       .bm-log-header {
