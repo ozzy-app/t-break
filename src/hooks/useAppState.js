@@ -644,6 +644,7 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
     endBreakFor,
     claimOffer,
     declineOffer,
+    claimAdminOffer,
     updateConfig,
     setDefaultConfig,
     loadDefaultConfig,
