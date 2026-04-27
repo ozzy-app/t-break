@@ -73,6 +73,11 @@ function TeamPill({ team }) {
 
 function BreakRow({ e, gridTemplate }) {
   const { isLate, overMs } = calcLate(e.type, e.startedAt, e.endedAt);
+  // Pauze duration in mm:ss
+  const durMs = (e.startedAt && e.endedAt) ? e.endedAt - e.startedAt : 0;
+  const pauzeStr = durMs > 0
+    ? `${Math.floor(durMs/60000)}m${String(Math.floor((durMs%60000)/1000)).padStart(2,'0')}s`
+    : '–';
   return (
     <li className="bm-admin-row" style={gridTemplate ? { gridTemplateColumns: gridTemplate } : undefined}>
       <TeamPill team={e.team} />
@@ -83,10 +88,9 @@ function BreakRow({ e, gridTemplate }) {
         lunch: 'heeft lunchpauze genomen',
       }[e.type] || ''}</span>
       <span className={`bm-admin-type bm-admin-type-${e.type}`}>{TYPES[e.type]?.label || '–'}</span>
-      <span />  {/* status — empty for completed */}
       <span>
         {isLate
-          ? <span className="bm-admin-late-pill">Laat</span>
+          ? <span className="bm-admin-late-pill">LAAT</span>
           : <span className={`bm-admin-tag bm-admin-tag-${e.endReason || 'timer'}`}>
               {endReasonText[e.endReason] || e.endReason || '—'}
             </span>
@@ -95,6 +99,7 @@ function BreakRow({ e, gridTemplate }) {
       <span className="bm-admin-overtime">{isLate ? fmtOver(overMs) : ''}</span>
       <span className="bm-admin-time-cell">{fmt2(e.startedAt)}</span>
       <span className="bm-admin-time-cell">{e.endedAt ? fmt2(e.endedAt) : '–'}</span>
+      <span className="bm-admin-time-cell">{pauzeStr}</span>
       <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.endedAt || e.startedAt)}</span>
     </li>
   );
@@ -107,7 +112,7 @@ function AdminRow({ e, gridTemplate }) {
       <TeamPill team={e.team} />
       <span className="bm-admin-name">{e.adminName}</span>
       <span className="bm-admin-time-action">{adminLogAction(e, teams)}</span>
-      {/* type | status | end-type | overtime | start | end — all empty */}
+      {/* type | eindstatus | overtime | start | einde | pauzetijd — all empty for admin rows */}
       <span /><span /><span /><span /><span /><span />
       <span className="bm-admin-tag bm-admin-tag-admin">{fmt2(e.at)}</span>
     </li>
