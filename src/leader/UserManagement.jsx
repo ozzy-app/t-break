@@ -226,22 +226,36 @@ function ExportModal({ userId, userName, onClose, notify }) {
 }
 
 // ── Main UserManagement view ─────────────────────────────────────
-// ── Activity log — same grid as main log ────────────────────────
+// ── Activity log — matches main log column structure ─────────────
+// Cols: Team | Naam | Logtekst | Type | Eindstatus | Overtijd | Start | Einde | Pauze Tijd | Log Tijd
 function ActivityLog({ logs }) {
   const [open, setOpen] = useState(false);
+  const teams = useTeams();
 
   const fmtTime = (ts) => ts
     ? new Date(ts).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
-    : '–';
-  const fmtFull = (ts) => ts
-    ? new Date(ts).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
-      new Date(ts).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
     : '–';
   const fmtOver = (ms) => {
     const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000);
     return m > 0 ? `+${m}m${s > 0 ? `${s}s` : ''}` : `+${s}s`;
   };
   const endReasonText = { early: 'VROEG', timer: 'TIMER', forfeit: 'VERLOPEN', 'leader-ended': 'ADMIN' };
+
+  const TeamPill = ({ teamId }) => {
+    if (!teamId) return <span />;
+    const bg = getTeamColor(teams, teamId);
+    const fg = getTeamTextColor(teams, teamId);
+    const label = getTeamLabel(teams, teamId) || teamId;
+    return (
+      <span style={{
+        fontSize: '10px', padding: '2px 7px', borderRadius: '4px',
+        background: bg, color: fg,
+        fontWeight: 600, whiteSpace: 'nowrap', display: 'inline-block',
+      }}>
+        {label}
+      </span>
+    );
+  };
 
   return (
     <div className="bm-um-log">
@@ -259,9 +273,10 @@ function ActivityLog({ logs }) {
                 if (e.kind === 'admin') {
                   return (
                     <li key={e.id} className="bm-admin-row bm-admin-row-admin">
-                      <span />
+                      <TeamPill teamId={e.team || e.action_data?.team} />
                       <span className="bm-admin-name">{e.admin_name || e.user_name}</span>
                       <span className="bm-admin-time-action">{e.action}</span>
+                      {/* type | eindstatus | overtime | start | einde | pauzetijd — empty */}
                       <span /><span /><span /><span /><span /><span />
                       <span className="bm-admin-tag bm-admin-tag-admin">
                         {fmtTime(e.started_at || e.created_at)}
@@ -271,20 +286,26 @@ function ActivityLog({ logs }) {
                 }
                 const EXPECTED = { brb: 180000, short: 900000, lunch: 1800000 };
                 const exp = EXPECTED[e.break_type] || 0;
-                const dur = e.duration_ms || 0;
-                const overMs = exp > 0 && dur > exp ? dur - exp : 0;
-                const isLate = overMs > 0;
+                const startMs = e.started_at ? new Date(e.started_at).getTime() : 0;
+                const endMs   = e.ended_at   ? new Date(e.ended_at).getTime()   : 0;
+                const durMs   = (startMs && endMs) ? endMs - startMs : (e.duration_ms || 0);
+                const overMs  = exp > 0 && durMs > exp ? durMs - exp : 0;
+                const isLate  = overMs > 0;
                 const endReason = e.end_reason || 'timer';
+                const pauzeStr = durMs > 0
+                  ? `${Math.floor(durMs/60000)}m${String(Math.floor((durMs%60000)/1000)).padStart(2,'0')}s`
+                  : '–';
+                const logText = {
+                  brb:   'is even BRB gegaan...',
+                  short: 'heeft korte pauze genomen',
+                  lunch: 'heeft lunchpauze genomen',
+                }[e.break_type] || '';
                 return (
                   <li key={e.id} className="bm-admin-row">
-                    <span />
+                    <TeamPill teamId={e.team} />
                     <span className="bm-admin-name">{e.user_name}</span>
                     <span className="bm-admin-log-text">
-                      {({
-                        brb: 'is even BRB gegaan...',
-                        short: 'heeft korte pauze genomen',
-                        lunch: 'heeft lunchpauze genomen',
-                      })[e.break_type] || ''}
+                      {logText}
                       <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--ink-3)', fontFamily: 'Geist Mono' }}>
                         {e.started_at ? new Date(e.started_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : ''}
                       </span>
@@ -292,10 +313,9 @@ function ActivityLog({ logs }) {
                     <span className={`bm-admin-type bm-admin-type-${e.break_type}`}>
                       {TYPES[e.break_type]?.label || '–'}
                     </span>
-                    <span />
                     <span>
                       {isLate
-                        ? <span className="bm-admin-late-pill">Laat</span>
+                        ? <span className="bm-admin-late-pill">LAAT</span>
                         : <span className={`bm-admin-tag bm-admin-tag-${endReason}`}>
                             {endReasonText[endReason] || endReason.toUpperCase()}
                           </span>
@@ -304,6 +324,7 @@ function ActivityLog({ logs }) {
                     <span className="bm-admin-overtime">{isLate ? fmtOver(overMs) : ''}</span>
                     <span className="bm-admin-time-cell">{fmtTime(e.started_at)}</span>
                     <span className="bm-admin-time-cell">{fmtTime(e.ended_at)}</span>
+                    <span className="bm-admin-time-cell">{pauzeStr}</span>
                     <span className="bm-admin-tag bm-admin-tag-admin">
                       {fmtTime(e.ended_at || e.started_at)}
                     </span>

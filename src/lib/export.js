@@ -8,6 +8,15 @@ const EXPECTED_SEC = {
   lunch: 1800,
 };
 
+function msToHmmss(ms) {
+  if (!ms || ms <= 0) return '';
+  const totalSec = Math.round(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
 // ── Column headers ────────────────────────────────────────────────
 // Matches log view: Team · Naam · Logtekst · Type · Eindstatus · Overtijd (min) · Start · Einde · Pauze Tijd · Log Tijd
 export const CSV_HEADERS = [
@@ -16,10 +25,10 @@ export const CSV_HEADERS = [
   'Logtekst',
   'Type',
   'Eindstatus',
-  'Overtijd (min)',
+  'Overtijd (H:MM:SS)',
   'Start',
   'Einde',
-  'Pauze Tijd (min)',
+  'Pauze Tijd (H:MM:SS)',
   'Log Tijd',
 ];
 
@@ -74,10 +83,8 @@ async function buildRows(data, teams = []) {
       };
       const logtekst = logtekstMap[r.break_type] || '';
 
-      // Pauze Tijd in minutes (numeric, blank if no end time)
-      const pauzeMin = durMs > 0
-        ? parseFloat((durMs / 60000).toFixed(2))
-        : '';
+      // Pauze Tijd as H:MM:SS
+      const pauzeMin = durMs > 0 ? msToHmmss(durMs) : '';
 
       // Log Tijd = ended_at or started_at
       const logTs = r.ended_at || r.started_at;
@@ -88,7 +95,7 @@ async function buildRows(data, teams = []) {
         logtekst,                                                  // Logtekst
         (r.break_type || '').toUpperCase(),                        // Type
         eindstatus,                                                // Eindstatus
-        isLate ? parseFloat((overMs / 60000).toFixed(2)) : '',    // Overtijd (min) — numeric
+        isLate ? msToHmmss(overMs) : '',                           // Overtijd (H:MM:SS)
         fmtTime(r.started_at),                                    // Start
         fmtTime(r.ended_at),                                      // Einde
         pauzeMin,                                                  // Pauze Tijd (min) — numeric
