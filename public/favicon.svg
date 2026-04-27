@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Outer red border frame (transparent inside) -->
+  <rect x="0.5" y="0.5" width="31" height="31" fill="none" stroke="#d82335" stroke-width="2" rx="1"/>
+  <!-- Transparent gap — nothing drawn -->
+  <!-- Inner red square -->
+  <rect x="5" y="5" width="22" height="22" fill="#d82335" rx="0.5"/>
+  <!-- White T cutout -->
+  <!-- T crossbar (top) -->
+  <rect x="7" y="7" width="18" height="6" fill="white"/>
+  <!-- T stem (center, bottom half) -->
+  <rect x="13" y="13" width="6" height="12" fill="white"/>
+</svg>
