@@ -58,11 +58,13 @@ function TeamPill({ team }) {
   const teams = useTeams();
   if (!team) return <span />;
   return (
-    <span style={{
-      fontSize: '10px', padding: '2px 7px', borderRadius: '4px',
-      background: getTeamColor(teams, team), color: getTeamTextColor(teams, team),
-      fontWeight: 600, whiteSpace: 'nowrap', display: 'inline-block',
-    }}>
+    <span
+      className="bm-user-team-pill"
+      style={{
+        background: getTeamColor(teams, team),
+        color: getTeamTextColor(teams, team),
+      }}
+    >
       {getTeamLabel(teams, team)}
     </span>
   );

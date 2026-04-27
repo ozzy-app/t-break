@@ -243,16 +243,15 @@ function ActivityLog({ logs }) {
 
   const TeamPill = ({ teamId }) => {
     if (!teamId) return <span />;
-    const bg = getTeamColor(teams, teamId);
-    const fg = getTeamTextColor(teams, teamId);
-    const label = getTeamLabel(teams, teamId) || teamId;
     return (
-      <span style={{
-        fontSize: '10px', padding: '2px 7px', borderRadius: '4px',
-        background: bg, color: fg,
-        fontWeight: 600, whiteSpace: 'nowrap', display: 'inline-block',
-      }}>
-        {label}
+      <span
+        className="bm-user-team-pill"
+        style={{
+          background: getTeamColor(teams, teamId),
+          color: getTeamTextColor(teams, teamId),
+        }}
+      >
+        {getTeamLabel(teams, teamId) || teamId}
       </span>
     );
   };
