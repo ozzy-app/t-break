@@ -152,7 +152,7 @@
       }
       .bm-dark-toggle:hover { border-color: var(--ink-2); transform: rotate(22deg); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
       .bm-brand { display: flex; align-items: center; gap: 10px; }
-      .bm-brand-mark { font-size: 20px; color: var(--brand); }
+      .bm-brand-mark { display: flex; align-items: center; flex-shrink: 0; }
       .bm-brand-name {
         font-family: 'Inter'; font-size: 20px; font-weight: 900; letter-spacing: -0.01em;
         color: var(--ink);

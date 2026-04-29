@@ -130,7 +130,12 @@ export function Header({ me, onSignOut, onToggleLeader, isEmployeeView, notify, 
     <header className="bm-header">
       {/* Brand */}
       <div className="bm-brand">
-        <span className="bm-brand-mark">▣</span>
+        <svg className="bm-brand-mark" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+          <rect x="0.5" y="0.5" width="31" height="31" fill="none" stroke="#d82335" strokeWidth="2" rx="1"/>
+          <rect x="5" y="5" width="22" height="22" fill="#d82335"/>
+          <rect x="7" y="7" width="18" height="6" fill="white"/>
+          <rect x="13" y="13" width="6" height="12" fill="white"/>
+        </svg>
         <span className="bm-brand-name">T-BREAK</span>
       </div>
 
