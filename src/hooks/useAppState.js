@@ -279,9 +279,6 @@ export function useAppState(me, setMe, notify, dynamicTeams) {
           adminGranted: true,
         };
         t.activeBreaks.push(breakEntry);
-        // Log it
-        const entry = { ...breakEntry, kind: 'break', endReason: null };
-        s.log.unshift(entry);
         notify(`${def.full} gestart (super ticket)`, 'ok');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return s;
