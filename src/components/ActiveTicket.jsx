@@ -1,4 +1,3 @@
-import { serverNow } from '../lib/serverTime';
 const IconCrown = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.9}}>
@@ -38,7 +37,7 @@ export function ActiveTicket({ myBreak, config, onEnd }) {
   const isAdminGrant = !!myBreak.adminGranted;
   const dur = config[TYPES[myBreak.type].durKey];
   const endAt = myBreak.startedAt + dur * 1000;
-  const now = serverNow();
+  const now = Date.now();
   const remaining = Math.max(0, Math.round((endAt - now) / 1000));
   const overBySec = Math.max(0, Math.round((now - endAt) / 1000));
   const pct = Math.max(0, Math.min(100, ((dur - remaining) / dur) * 100));

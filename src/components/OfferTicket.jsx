@@ -1,4 +1,3 @@
-import { serverNow } from '../lib/serverTime';
 const CrownWatermark = () => (
   <svg
     viewBox="0 0 24 24"
@@ -35,7 +34,7 @@ import { fmt } from '../lib/helpers';
 
 export function OfferTicket({ type, offeredAt, onClaim, onDecline, isAdminGrant = false }) {
   const expiresAt = offeredAt + CLAIM_WINDOW_SEC * 1000;
-  const remaining = Math.max(0, Math.round((expiresAt - serverNow()) / 1000));
+  const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
   const pct = Math.max(0, Math.min(100, (remaining / CLAIM_WINDOW_SEC) * 100));
   const urgent = remaining <= 60;
   const def = TYPES[type];
