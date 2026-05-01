@@ -225,6 +225,8 @@ export function ensureTeamsInState(state, teamIds) {
 export function cleanup(state, nowMs) {
   const s = JSON.parse(JSON.stringify(state));
   const now = nowMs || Date.now();
+  // Use local clock for day boundary — clock skew only matters for offer windows (minutes), not days
+  const todayCheck = () => todayStr();
   if (!s.totalTime) s.totalTime = {};
   if (!s.defaultConfigs) s.defaultConfigs = {};
   if (!s._lastDate) s._lastDate = todayStr();

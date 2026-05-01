@@ -43,6 +43,11 @@ export async function syncServerTime() {
       const roundTrip = localAfter - localBefore;
       const localAtServer = localBefore + roundTrip / 2;
       _offset = localAtServer - serverMs;
+      // Safety cap: never apply offset > 10 minutes
+      if (Math.abs(_offset) > 10 * 60 * 1000) {
+        console.warn(`[serverTime] offset ${_offset}ms too large, capping to 0`);
+        _offset = 0;
+      }
       _synced = true;
       console.log(`[serverTime] offset=${_offset}ms`);
     } catch (e) {
